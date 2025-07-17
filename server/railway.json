@@ -1,0 +1,9 @@
+{
+  "name": "cvflo",
+  "build": {
+    "command": "bun run start:full"
+  },
+  "deploy": {
+    "startCommand": "bun run start:full"
+  }
+}

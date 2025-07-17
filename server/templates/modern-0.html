@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{personalInfo.firstName}} {{personalInfo.lastName}} - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+      body {
+        font-family: 'Inter', Arial, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        line-height: 1.6;
+        scroll-behavior: smooth;
+        overflow-y: auto;
+      }
+
+      .container-resume {
+        font-size: 11pt;
+      }
+
+      /* List styling for proper bullet points and numbered lists */
+      ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      li {
+        margin: 0.25rem 0;
+        line-height: 1.5;
+      }
+
+      ul ul {
+        list-style-type: circle;
+      }
+
+      ul ul ul {
+        list-style-type: square;
+      }
+
+      .section-title {
+        border-bottom: 3px solid #3b82f6;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+        font-weight: 700;
+        font-size: 18pt;
+        color: #1e40af;
+        font-family: 'Playfair Display', serif;
+        position: relative;
+      }
+
+      .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        border-radius: 2px;
+      }
+
+      .header-name {
+        font-family: 'Playfair Display', serif;
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+      }
+
+      .contact-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 16px;
+        padding: 16px;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+      }
+
+      .contact-item {
+        font-size: 10pt;
+        color: #475569;
+        font-weight: 500;
+      }
+
+      .content-section {
+        margin-bottom: 24px;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+      }
+
+      .experience-item {
+        margin-bottom: 20px;
+        padding: 16px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 8px;
+        border-left: 3px solid #3b82f6;
+      }
+
+      .experience-header {
+        display: flex;
+        justify-content: between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .position-title {
+        font-weight: 700;
+        font-size: 12pt;
+        color: #1e40af;
+        margin-bottom: 4px;
+      }
+
+      .company-name {
+        font-weight: 600;
+        color: #475569;
+        font-size: 11pt;
+      }
+
+      .date-location {
+        font-size: 9pt;
+        color: #64748b;
+        text-align: right;
+        font-style: italic;
+      }
+
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .skill-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-radius: 8px;
+        border: 1px solid #0ea5e9;
+        font-size: 10pt;
+      }
+
+      .skill-level {
+        font-weight: 600;
+        color: #0369a1;
+      }
+
+      @page {
+        margin: 0.5in;
+        size: A4;
+      }
+
+      @media print {
+        body {
+          font-size: 10pt;
+        }
+        
+        .container-resume {
+          box-shadow: none;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .section-title {
+          font-size: 16pt;
+        }
+        
+        .content-section {
+          box-shadow: none;
+          border: none;
+          background: white;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 py-8">
+    <div class="container-resume bg-white max-w-[800px] mx-auto p-8 shadow-lg rounded-lg">
+      <!-- Header -->
+      {{#if personalInfo.firstName}}
+        <header class="mb-8 text-center">
+          <h1 class="header-name text-4xl font-bold mb-2">
+            {{personalInfo.firstName}} {{personalInfo.lastName}}
+          </h1>
+          {{#if personalInfo.title}}
+            <h2 class="text-xl text-gray-600 mb-4 font-medium">{{personalInfo.title}}</h2>
+          {{/if}}
+          
+          <div class="contact-info">
+            {{#if personalInfo.email}}
+              <div class="contact-item">
+                <strong>Email:</strong> <a href="mailto:{{personalInfo.email}}" class="text-blue-600">{{personalInfo.email}}</a>
+              </div>
+            {{/if}}
+            {{#if personalInfo.phone}}
+              <div class="contact-item">
+                <strong>Phone:</strong> {{personalInfo.phone}}
+              </div>
+            {{/if}}
+            {{#if personalInfo.address}}
+              <div class="contact-item">
+                <strong>Location:</strong> 
+                {{personalInfo.address}}{{#if personalInfo.city}}, {{personalInfo.city}}{{/if}}{{#if personalInfo.state}}, {{personalInfo.state}}{{/if}}{{#if personalInfo.zipCode}}, {{personalInfo.zipCode}}{{/if}}{{#if personalInfo.country}}, {{personalInfo.country}}{{/if}}
+              </div>
+            {{/if}}
+            {{#if personalInfo.website}}
+              <div class="contact-item">
+                <strong>Website:</strong> <a href="{{personalInfo.website}}" class="text-blue-600 underline">{{personalInfo.website}}</a>
+              </div>
+            {{/if}}
+            {{#if personalInfo.linkedin}}
+              <div class="contact-item">
+                <strong>LinkedIn:</strong> <a href="{{personalInfo.linkedin}}" class="text-blue-600 underline">{{personalInfo.linkedin}}</a>
+              </div>
+            {{/if}}
+          </div>
+        </header>
+      {{/if}}
+
+      <!-- Summary -->
+      {{#if visibility.summary}}
+        {{#if summary}}
+          <section class="content-section">
+            <h2 class="section-title">Professional Summary</h2>
+            <p class="text-gray-700 leading-relaxed">{{summary}}</p>
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Work Experience -->
+      {{#if visibility.workExperience}}
+        {{#if workExperience.length}}
+          <section class="content-section">
+            <h2 class="section-title">Work Experience</h2>
+            {{#each workExperience}}
+              <div class="experience-item">
+                <div class="experience-header">
+                  <div class="flex-1">
+                    <h3 class="position-title">{{this.position}}</h3>
+                    <div class="company-name">{{this.company}}</div>
+                  </div>
+                  <div class="date-location">
+                    <div>{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                    {{#if this.location}}
+                      <div>{{this.location}}</div>
+                    {{/if}}
+                  </div>
+                </div>
+                {{#if this.description}}
+                  <div class="text-gray-700 mt-3 leading-relaxed">{{{this.description}}}</div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Projects -->
+      {{#if visibility.projects}}
+        {{#if projects.length}}
+          <section class="content-section">
+            <h2 class="section-title">Projects</h2>
+            {{#each projects}}
+              <div class="experience-item">
+                <div class="experience-header">
+                  <div class="flex-1">
+                    <h3 class="position-title">
+                      {{#if this.liveUrl}}
+                        <a href="{{this.liveUrl}}" class="text-blue-600 underline">{{this.title}}</a>
+                      {{else}}
+                        {{this.title}}
+                      {{/if}}
+                    </h3>
+                    {{#if this.technologies.length > 0}}
+                      <div class="text-xs text-gray-600 mt-1">
+                        <strong>Technologies:</strong> 
+                        {{#each this.technologies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                      </div>
+                    {{/if}}
+                  </div>
+                  <div class="date-location">
+                    <div>{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                  </div>
+                </div>
+                {{#if this.description}}
+                  <div class="text-gray-700 mt-3 leading-relaxed">{{{this.description}}}</div>
+                {{/if}}
+                {{#if this.githubUrl}}
+                  <div class="text-sm text-gray-600 mt-2">
+                    <strong>GitHub:</strong> <a href="{{this.githubUrl}}" class="text-blue-600 underline">{{this.githubUrl}}</a>
+                  </div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Education -->
+      {{#if visibility.education}}
+        {{#if education.length}}
+          <section class="content-section">
+            <h2 class="section-title">Education</h2>
+            {{#each education}}
+              <div class="experience-item">
+                <div class="experience-header">
+                  <div class="flex-1">
+                    <h3 class="position-title">{{this.institution}}</h3>
+                    <div class="company-name">{{this.degree}}{{#if this.field}}, {{this.field}}{{/if}}</div>
+                  </div>
+                  <div class="date-location">
+                    <div>{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                    {{#if this.location}}
+                      <div>{{this.location}}</div>
+                    {{/if}}
+                  </div>
+                </div>
+                {{#if this.description}}
+                  <div class="text-gray-700 mt-3 leading-relaxed">{{{this.description}}}</div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Skills -->
+      {{#if visibility.skills}}
+        {{#if skills.length}}
+          <section class="content-section">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-grid">
+              {{#each skills}}
+                <div class="skill-item">
+                  <span class="font-medium">{{this.name}}</span>
+                  {{#if this.level}}
+                    <span class="skill-level">{{this.level}}/5</span>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Interests -->
+      {{#if visibility.interests}}
+        {{#if interests.length}}
+          <section class="content-section">
+            <h2 class="section-title">Interests</h2>
+            <div class="flex flex-wrap gap-3">
+              {{#each interests}}
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">{{this.name}}</span>
+              {{/each}}
+            </div>
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- References -->
+      {{#if visibility.references}}
+        {{#if references.length}}
+          <section class="content-section">
+            <h2 class="section-title">References</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {{#each references}}
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 class="font-semibold text-gray-800">{{this.name}}</h3>
+                  <div class="text-gray-600 text-sm mb-2">{{this.position}}{{#if this.company}}, {{this.company}}{{/if}}</div>
+                  {{#if this.email}}
+                    <div class="text-sm text-blue-600">{{this.email}}</div>
+                  {{/if}}
+                  {{#if this.phone}}
+                    <div class="text-sm text-gray-700">{{this.phone}}</div>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </section>
+        {{/if}}
+      {{/if}}
+    </div>
+  </body>
+</html>

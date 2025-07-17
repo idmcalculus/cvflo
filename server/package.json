@@ -1,0 +1,44 @@
+{
+  "name": "cvflo-server",
+  "version": "1.0.0",
+  "description": "CVFlo - Professional CV Builder Server",
+  "module": "src/server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun src/server.ts",
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir ./dist --target bun",
+    "lint": "eslint . --ext .ts",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "build:client": "cd ../client && bun install && bun run build",
+    "setup:public": "rm -rf public && mkdir -p public && mv ../client/dist/* ./public/ && rm -rf ../client/dist",
+    "dev:full": "bun run build:client && bun run setup:public && bun run dev",
+    "start:full": "bun run build:client && bun run setup:public && bun run start"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "puppeteer": "^24.10.1",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.3",
+    "@types/supertest": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
+    "bun-types": "latest",
+    "cheerio": "^1.1.0",
+    "eslint": "^9.29.0",
+    "supertest": "^7.1.1",
+    "typescript": "^5.8.3"
+  }
+}

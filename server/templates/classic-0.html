@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{personalInfo.firstName}} {{personalInfo.lastName}} - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@700&display=swap');
+
+      body {
+        font-family: 'Inter', Arial, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        line-height: 1.4;
+        scroll-behavior: smooth;
+        overflow-y: auto;
+      }
+
+      .container-resume {
+        font-size: 11pt;
+      }
+
+      /* List styling for proper bullet points and numbered lists */
+      ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      li {
+        margin: 0.25rem 0;
+        line-height: 1.5;
+      }
+
+      ul ul {
+        list-style-type: circle;
+      }
+
+      ul ul ul {
+        list-style-type: square;
+      }
+
+      .section-title {
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 4px;
+        margin-bottom: 12px;
+        font-weight: 700;
+        font-size: 16pt;
+        color: #1e40af;
+        font-family: 'Lora', serif;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 16px;
+        align-items: start;
+        margin-bottom: 12px;
+      }
+
+      .date-col {
+        font-size: 9pt;
+        color: #6b7280;
+        text-align: right;
+      }
+
+      .title-col h3 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 11pt;
+      }
+
+      .text-muted-date {
+        color: #6b7280;
+        font-size: 9pt;
+      }
+
+      .custom-list {
+        margin-left: 16px;
+        margin-top: 4px;
+      }
+
+      .custom-list li {
+        margin-bottom: 2px;
+      }
+
+      @page {
+        margin: 0.5in;
+        size: A4;
+      }
+
+      @media print {
+        body {
+          font-size: 10pt;
+        }
+        
+        .container-resume {
+          box-shadow: none;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .section-title {
+          font-size: 14pt;
+        }
+        
+        .title-col h3 {
+          font-size: 10pt;
+        }
+      }
+    </style>
+  </head>
+  <body class="py-8">
+    <div class="container-resume bg-white max-w-[800px] mx-auto p-10 shadow-md">
+      <!-- Header -->
+      {{#if personalInfo.firstName}}
+        <header class="mb-8">
+          <h1 class="text-3xl font-bold font-lora mb-1">
+            {{personalInfo.firstName}} {{personalInfo.lastName}}
+          </h1>
+          {{#if personalInfo.title}}
+            <h2 class="text-xl text-gray-600 mb-4">{{personalInfo.title}}</h2>
+          {{/if}}
+          
+          <div class="flex flex-wrap text-sm text-gray-700">
+            {{#if personalInfo.email}}
+              <div class="mr-6 mb-2"><strong>Email:</strong> {{personalInfo.email}}</div>
+            {{/if}}
+            {{#if personalInfo.phone}}
+              <div class="mr-6 mb-2"><strong>Phone:</strong> {{personalInfo.phone}}</div>
+            {{/if}}
+            {{#if personalInfo.address}}
+              <div class="mr-6 mb-2"><strong>Location:</strong> 
+                {{personalInfo.address}}{{#if personalInfo.city}}, {{personalInfo.city}}{{/if}}{{#if personalInfo.state}}, {{personalInfo.state}}{{/if}}{{#if personalInfo.zipCode}}, {{personalInfo.zipCode}}{{/if}}{{#if personalInfo.country}}, {{personalInfo.country}}{{/if}}
+              </div>
+            {{/if}}
+            {{#if personalInfo.website}}
+              <div class="mb-2"><strong>Website:</strong> {{personalInfo.website}}</div>
+            {{/if}}
+            {{#if personalInfo.linkedin}}
+              <div class="mb-2"><strong>LinkedIn:</strong> <a href="{{personalInfo.linkedin}}" class="underline">{{personalInfo.linkedin}}</a></div>
+            {{/if}}
+          </div>
+        </header>
+      {{/if}}
+
+      <!-- Summary -->
+      {{#if visibility.summary}}
+        {{#if summary}}
+          <section id="summary-section" class="mb-6">
+            <h2 class="section-title">Summary</h2>
+            <p class="text-sm">{{summary}}</p>
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Work Experience -->
+      {{#if visibility.workExperience}}
+        {{#if workExperience.length}}
+          <section id="experience-section" class="mb-6">
+            <h2 class="section-title">Work Experience</h2>
+            {{#each workExperience}}
+              <div class="mb-4 content-grid">
+                <div class="date-col text-right">
+                  <div class="text-muted-date">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                  {{#if this.location}}
+                    <div class="text-muted-date">{{this.location}}</div>
+                  {{/if}}
+                </div>
+                <div class="title-col">
+                  <h3 class="font-semibold">{{this.position}}</h3>
+                  <div class="text-gray-700 text-sm">{{this.company}}</div>
+                  {{#if this.description}}
+                    <div class="text-sm mt-1">{{{this.description}}}</div>
+                  {{/if}}
+                </div>
+              </div>
+            {{/each}}
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Projects -->
+      {{#if visibility.projects}}
+        {{#if projects.length}}
+          <section id="projects-section" class="mb-6">
+            <h2 class="section-title">Projects</h2>
+            {{#each projects}}
+              <div class="mb-4 content-grid">
+                <div class="date-col text-right">
+                  <div class="text-muted-date">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                </div>
+                <div class="title-col">
+                  <h3 class="font-semibold">
+                    {{#if this.liveUrl}}
+                      <a href="{{this.liveUrl}}" class="underline">{{this.title}}</a>
+                    {{else}}
+                      {{this.title}}
+                    {{/if}}
+                  </h3>
+                  {{#if this.description}}
+                    <div class="text-sm mt-1">{{{this.description}}}</div>
+                  {{/if}}
+                  {{#if this.technologies.length > 0}}
+                    <div class="text-xs text-gray-600 mt-1">
+                      <strong>Technologies:</strong> 
+                      {{#each this.technologies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                    </div>
+                  {{/if}}
+                  {{#if this.githubUrl}}
+                    <div class="text-xs text-gray-600 mt-1">
+                      <strong>GitHub:</strong> <a href="{{this.githubUrl}}" class="underline">{{this.githubUrl}}</a>
+                    </div>
+                  {{/if}}
+                </div>
+              </div>
+            {{/each}}
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Education -->
+      {{#if visibility.education}}
+        {{#if education.length}}
+          <section id="education-section" class="mb-6">
+            <h2 class="section-title">Education</h2>
+            {{#each education}}
+              <div class="mb-4 content-grid">
+                <div class="date-col text-right">
+                  <div class="text-muted-date">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                  {{#if this.location}}
+                    <div class="text-muted-date">{{this.location}}</div>
+                  {{/if}}
+                </div>
+                <div class="title-col">
+                  <h3 class="font-semibold">{{this.institution}}</h3>
+                  <div class="text-gray-700 text-sm">{{this.degree}}{{#if this.field}}, {{this.field}}{{/if}}</div>
+                  {{#if this.description}}
+                    <div class="text-sm mt-1">{{{this.description}}}</div>
+                  {{/if}}
+                </div>
+              </div>
+            {{/each}}
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Skills -->
+      {{#if visibility.skills}}
+        {{#if skills.length}}
+          <section id="skills-section" class="mb-6">
+            <h2 class="section-title">Skills</h2>
+            <div class="flex flex-wrap">
+              {{#each skills}}
+                <div class="mr-4 mb-2">
+                  <span class="font-medium">{{this.name}}</span>
+                  {{#if this.level}}
+                    <span class="text-gray-500 text-sm"> ({{this.level}}/5)</span>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- Interests -->
+      {{#if visibility.interests}}
+        {{#if interests.length}}
+          <section id="interests-section" class="mb-6">
+            <h2 class="section-title">Interests</h2>
+            <p>{{#each interests}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+          </section>
+        {{/if}}
+      {{/if}}
+
+      <!-- References -->
+      {{#if visibility.references}}
+        {{#if references.length}}
+          <section id="references-section">
+            <h2 class="section-title">References</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {{#each references}}
+                <div>
+                  <h3 class="font-semibold">{{this.name}}</h3>
+                  <div class="text-gray-700 text-sm">{{this.position}}{{#if this.company}}, {{this.company}}{{/if}}</div>
+                  {{#if this.email}}
+                    <div class="text-sm">{{this.email}}</div>
+                  {{/if}}
+                  {{#if this.phone}}
+                    <div class="text-sm">{{this.phone}}</div>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </section>
+        {{/if}}
+      {{/if}}
+    </div>
+  </body>
+</html>
