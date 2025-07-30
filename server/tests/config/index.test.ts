@@ -27,7 +27,7 @@ describe('Config', () => {
     // @ts-expect-error - Dynamic import with query string for isolation
     const config = (await import(`../../src/config/index.ts?default`)).default;
 
-    expect(config.port).toBe(5000);
+    expect(config.port).toBe(5001);
     expect(config.nodeEnv).toBe('development');
     expect(config.clientUrl).toBe('http://localhost:3000');
     expect(config.rateLimitWindow).toBe(15 * 60 * 1000); // 15 minutes
@@ -105,7 +105,7 @@ describe('Config', () => {
     const config = (await import(`../../src/config/index.ts?empty_string`)).default;
 
     // The helpers should fallback to defaults for empty strings
-    expect(config.port).toBe(5000);
+    expect(config.port).toBe(5001);
     expect(config.nodeEnv).toBe('development');
     expect(config.clientUrl).toBe('http://localhost:3000');
   });

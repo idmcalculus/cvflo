@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useCVStore } from '../../store/cvStore';
 import { Project } from '../../types/cv.types';
 import { Plus, Trash2, Edit2, Link, Github } from 'lucide-react';
-import QuillEditor from '../QuillEditor';
+import RichTextEditor from '../RichTextEditor';
 
 type ProjectFormData = Omit<Project, 'id'>;
 
@@ -93,7 +93,7 @@ const ProjectsForm: React.FC = () => {
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description *
           </label>
-          <QuillEditor
+          <RichTextEditor
             value={watch('description')}
             onChange={(content) => setValue('description', content)}
             className="bg-white"

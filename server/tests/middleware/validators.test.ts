@@ -8,6 +8,8 @@ const mockChain = {
   withMessage: mock().mockReturnThis(),
   notEmpty: mock().mockReturnThis(),
   isObject: mock().mockReturnThis(),
+  optional: mock().mockReturnThis(),
+  isInt: mock().mockReturnThis(),
 };
 
 const mockCheck = mock(() => mockChain);
@@ -30,6 +32,8 @@ describe('Validators Middleware', () => {
     mockChain.withMessage.mockClear();
     mockChain.notEmpty.mockClear();
     mockChain.isObject.mockClear();
+    mockChain.optional.mockClear();
+    mockChain.isInt.mockClear();
     mockValidationResult.mockClear();
 
     mockNext = mock();
@@ -49,7 +53,7 @@ describe('Validators Middleware', () => {
       expect(mockCheck).toHaveBeenCalledWith('cvData');
       expect(mockCheck).toHaveBeenCalledWith('visibility');
       expect(mockChain.exists).toHaveBeenCalledTimes(2);
-      expect(mockChain.notEmpty).toHaveBeenCalledTimes(2);
+      expect(mockChain.notEmpty).toHaveBeenCalledTimes(4); // Updated for skills validation
       expect(mockChain.isObject).toHaveBeenCalledTimes(1);
     });
 
@@ -57,7 +61,7 @@ describe('Validators Middleware', () => {
       mockValidationResult.mockReturnValue({ isEmpty: () => true });
 
       const { validatePdfRequest } = await import('../../src/middleware/validators.ts');
-      const validationHandler = validatePdfRequest[2] as (req: Request, res: Response, next: NextFunction) => void;
+      const validationHandler = validatePdfRequest[validatePdfRequest.length - 1] as (req: Request, res: Response, next: NextFunction) => void;
 
       validationHandler(mockReq as Request, mockRes as Response, mockNext);
 
@@ -73,7 +77,7 @@ describe('Validators Middleware', () => {
       });
 
       const { validatePdfRequest } = await import('../../src/middleware/validators.ts');
-      const validationHandler = validatePdfRequest[2] as (req: Request, res: Response, next: NextFunction) => void;
+      const validationHandler = validatePdfRequest[validatePdfRequest.length - 1] as (req: Request, res: Response, next: NextFunction) => void;
 
       validationHandler(mockReq as Request, mockRes as Response, mockNext);
 

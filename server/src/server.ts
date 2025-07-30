@@ -1,6 +1,7 @@
 import { createApp } from './app.ts';
 import { createAppLogger } from './utils/logger.ts';
 import config from './config/index.ts';
+import { getPuppeteerPool, shutdownPuppeteerPool } from './services/puppeteerPool.ts';
 
 const logger = createAppLogger(); // Create a logger instance for general use
 
@@ -9,15 +10,33 @@ const startServer = async () => {
     const port = config.port;
     const app = await createApp();
 
+    // Initialize and warm up the Puppeteer pool
+    logger.info('Initializing Puppeteer pool...');
+    const pool = getPuppeteerPool();
+    await pool.warmUp();
+    logger.info('Puppeteer pool initialized and warmed up');
+
     const server = app.listen(port, () => {
       logger.info(`Server is running in ${config.nodeEnv} mode on port ${port}`);
       logger.info(`Using Bun runtime version: ${Bun.version}`);
+      logger.info(`Puppeteer pool stats: ${JSON.stringify(pool.getStats())}`);
     });
 
-    const gracefulShutdown = (signal: string) => {
+    const gracefulShutdown = async (signal: string) => {
       logger.info(`${signal} received. Shutting down gracefully...`);
-      server.close(() => {
+      
+      // Close the server first
+      server.close(async () => {
         logger.info('Server closed.');
+        
+        // Clean up Puppeteer pool
+        try {
+          await shutdownPuppeteerPool();
+          logger.info('Puppeteer pool cleaned up.');
+        } catch (error) {
+          logger.error('Error cleaning up Puppeteer pool', { error });
+        }
+        
         process.exit(0);
       });
     };

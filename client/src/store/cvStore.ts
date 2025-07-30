@@ -1,15 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { 
-  CVData, 
-  SectionVisibility, 
-  PersonalInfo, 
-  WorkExperience, 
-  Education, 
-  Project, 
-  Skill, 
-  Interest, 
-  Reference 
+import {
+  CVData,
+  SectionVisibility,
+  SectionSettings,
+  PersonalInfo,
+  WorkExperience,
+  Education,
+  Project,
+  Skill,
+  Interest,
+  Reference,
+  CustomField
 } from '../types/cv.types';
 
 interface UIState {
@@ -23,21 +25,41 @@ interface CVState {
   visibility: SectionVisibility;
   activeSection: string;
   selectedTemplate: string;
+  defaultTemplate: string;
   ui: UIState;
-  
+  lastSyncedAt: string | null;
+  isDirty: boolean; // Track if local changes need to be synced
+
   setActiveSection: (section: string) => void;
   toggleSectionVisibility: (section: keyof SectionVisibility) => void;
   setSelectedTemplate: (templateName: string) => void;
+  setDefaultTemplate: (templateName: string) => void;
+  resetToDefaultTemplate: () => void;
+  initializeTemplate: () => void;
+  
+  // Database sync methods
+  loadFromDatabase: (dbData: {cvData: CVData, visibility: SectionVisibility, selectedTemplate: string}) => void;
+  markAsSynced: () => void;
+  markAsDirty: () => void;
+  clearAllData: () => void;
+
+  // Section settings actions
+  updateSectionSettings: (settings: Partial<SectionSettings>) => void;
+  toggleSkillsProficiencyLevels: () => void;
   
   // UI actions
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleFullscreen: () => void;
   setFullscreen: (fullscreen: boolean) => void;
-  toggleSidebarCompactMode: () => void;
   
   updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
   updateSummary: (summary: string) => void;
+  
+  // Custom fields actions
+  addCustomField: (field: Omit<CustomField, 'id'>) => void;
+  updateCustomField: (id: string, field: Partial<CustomField>) => void;
+  removeCustomField: (id: string) => void;
   
   addWorkExperience: (experience: Omit<WorkExperience, 'id'>) => void;
   updateWorkExperience: (id: string, experience: Partial<WorkExperience>) => void;
@@ -64,10 +86,18 @@ interface CVState {
   removeReference: (id: string) => void;
 }
 
+// Initial section settings
+const initialSectionSettings: SectionSettings = {
+  skills: {
+    showProficiencyLevels: false, // Default to disabled
+  },
+};
+
 // Initial data
 const initialData: CVData = {
   personalInfo: {
     firstName: '',
+    middleName: '',
     lastName: '',
     title: '',
     email: '',
@@ -79,6 +109,14 @@ const initialData: CVData = {
     country: '',
     website: '',
     linkedin: '',
+    github: '',
+    x: '',
+    facebook: '',
+    instagram: '',
+    youtube: '',
+    medium: '',
+    stackoverflow: '',
+    customFields: [],
   },
   summary: '',
   workExperience: [],
@@ -87,6 +125,7 @@ const initialData: CVData = {
   skills: [],
   interests: [],
   references: [],
+  sectionSettings: initialSectionSettings,
 };
 
 // Initial visibility settings
@@ -114,23 +153,77 @@ const initialUIState: UIState = {
 
 export const useCVStore = create<CVState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       data: initialData,
       visibility: initialVisibility,
       activeSection: 'personalInfo',
-      selectedTemplate: 'default',
+      selectedTemplate: 'classic-0',
+      defaultTemplate: 'classic-0',
       ui: initialUIState,
+      lastSyncedAt: null,
+      isDirty: false,
       
       setActiveSection: (section) => set({ activeSection: section }),
       
-      setSelectedTemplate: (templateName) => set({ selectedTemplate: templateName }),
+      setSelectedTemplate: (templateName) => set({ selectedTemplate: templateName, isDirty: true }),
+      
+      setDefaultTemplate: (templateName) => set({ defaultTemplate: templateName }),
+      
+      resetToDefaultTemplate: () => set((state) => ({ selectedTemplate: state.defaultTemplate })),
+      
+      // Initialize with default template if no template is selected
+      initializeTemplate: () => {
+        const state = get();
+        if (!state.selectedTemplate || state.selectedTemplate === 'default') {
+          set({ selectedTemplate: state.defaultTemplate });
+        }
+      },
+
+      // Database sync methods
+      loadFromDatabase: (dbData) => {
+        if (dbData && dbData.cvData) {
+          // Handle migration from 'twitter' to 'x' field
+          const migratedData = { ...dbData.cvData };
+          if (migratedData.personalInfo && 'twitter' in migratedData.personalInfo) {
+            migratedData.personalInfo.x = migratedData.personalInfo.twitter;
+            delete migratedData.personalInfo.twitter;
+          }
+          
+          set({
+            data: migratedData,
+            visibility: dbData.visibility || initialVisibility,
+            selectedTemplate: dbData.selectedTemplate || 'classic-0',
+            lastSyncedAt: dbData.lastUpdated || new Date().toISOString(),
+            isDirty: false
+          });
+        }
+      },
+
+      markAsSynced: () => set({ 
+        lastSyncedAt: new Date().toISOString(), 
+        isDirty: false 
+      }),
+
+      markAsDirty: () => set({ isDirty: true }),
+      
+      clearAllData: () => set({
+        data: initialData,
+        visibility: initialVisibility,
+        activeSection: 'personalInfo',
+        selectedTemplate: 'classic-0',
+        defaultTemplate: 'classic-0',
+        ui: initialUIState,
+        lastSyncedAt: null,
+        isDirty: false,
+      }),
       
       toggleSectionVisibility: (section) => 
         set((state) => ({
           visibility: {
             ...state.visibility,
             [section]: !state.visibility[section],
-          }
+          },
+          isDirty: true
         })),
       
       // UI actions
@@ -164,12 +257,56 @@ export const useCVStore = create<CVState>()(
           data: {
             ...state.data,
             personalInfo: { ...state.data.personalInfo, ...info },
-          }
+          },
+          isDirty: true
         })),
       
       updateSummary: (summary) => 
         set((state) => ({
           data: { ...state.data, summary },
+          isDirty: true
+        })),
+      
+      // Custom fields actions
+      addCustomField: (field) => 
+        set((state) => ({
+          data: {
+            ...state.data,
+            personalInfo: {
+              ...state.data.personalInfo,
+              customFields: [
+                ...(state.data.personalInfo.customFields || []),
+                { ...field, id: generateId() },
+              ],
+            },
+          },
+          isDirty: true
+        })),
+      
+      updateCustomField: (id, field) => 
+        set((state) => ({
+          data: {
+            ...state.data,
+            personalInfo: {
+              ...state.data.personalInfo,
+              customFields: (state.data.personalInfo.customFields || []).map((f) => 
+                f.id === id ? { ...f, ...field } : f
+              ),
+            },
+          },
+          isDirty: true
+        })),
+      
+      removeCustomField: (id) => 
+        set((state) => ({
+          data: {
+            ...state.data,
+            personalInfo: {
+              ...state.data.personalInfo,
+              customFields: (state.data.personalInfo.customFields || []).filter((f) => f.id !== id),
+            },
+          },
+          isDirty: true
         })),
       
       addWorkExperience: (experience) => 
@@ -180,7 +317,8 @@ export const useCVStore = create<CVState>()(
               ...state.data.workExperience,
               { ...experience, id: generateId() },
             ],
-          }
+          },
+          isDirty: true
         })),
       
       updateWorkExperience: (id, experience) => 
@@ -190,7 +328,8 @@ export const useCVStore = create<CVState>()(
             workExperience: state.data.workExperience.map((exp) => 
               exp.id === id ? { ...exp, ...experience } : exp
             ),
-          }
+          },
+          isDirty: true
         })),
       
       removeWorkExperience: (id) => 
@@ -198,7 +337,8 @@ export const useCVStore = create<CVState>()(
           data: {
             ...state.data,
             workExperience: state.data.workExperience.filter((exp) => exp.id !== id),
-          }
+          },
+          isDirty: true
         })),
       
       addEducation: (education) => 
@@ -209,7 +349,8 @@ export const useCVStore = create<CVState>()(
               ...state.data.education,
               { ...education, id: generateId() },
             ],
-          }
+          },
+          isDirty: true
         })),
       
       updateEducation: (id, education) => 
@@ -219,7 +360,8 @@ export const useCVStore = create<CVState>()(
             education: state.data.education.map((edu) => 
               edu.id === id ? { ...edu, ...education } : edu
             ),
-          }
+          },
+          isDirty: true
         })),
       
       removeEducation: (id) => 
@@ -227,7 +369,8 @@ export const useCVStore = create<CVState>()(
           data: {
             ...state.data,
             education: state.data.education.filter((edu) => edu.id !== id),
-          }
+          },
+          isDirty: true
         })),
       
       addProject: (project) => 
@@ -238,7 +381,8 @@ export const useCVStore = create<CVState>()(
               ...state.data.projects,
               { ...project, id: generateId() },
             ],
-          }
+          },
+          isDirty: true
         })),
       
       updateProject: (id, project) => 
@@ -248,7 +392,8 @@ export const useCVStore = create<CVState>()(
             projects: state.data.projects.map((proj) => 
               proj.id === id ? { ...proj, ...project } : proj
             ),
-          }
+          },
+          isDirty: true
         })),
       
       removeProject: (id) => 
@@ -256,7 +401,8 @@ export const useCVStore = create<CVState>()(
           data: {
             ...state.data,
             projects: state.data.projects.filter((proj) => proj.id !== id),
-          }
+          },
+          isDirty: true
         })),
       
       addSkill: (skill) => 
@@ -267,7 +413,8 @@ export const useCVStore = create<CVState>()(
               ...state.data.skills,
               { ...skill, id: generateId() },
             ],
-          }
+          },
+          isDirty: true
         })),
       
       updateSkill: (id, skill) => 
@@ -277,7 +424,8 @@ export const useCVStore = create<CVState>()(
             skills: state.data.skills.map((s) => 
               s.id === id ? { ...s, ...skill } : s
             ),
-          }
+          },
+          isDirty: true
         })),
       
       removeSkill: (id) => 
@@ -285,7 +433,8 @@ export const useCVStore = create<CVState>()(
           data: {
             ...state.data,
             skills: state.data.skills.filter((s) => s.id !== id),
-          }
+          },
+          isDirty: true
         })),
       
       addInterest: (interest) => 
@@ -296,7 +445,8 @@ export const useCVStore = create<CVState>()(
               ...state.data.interests,
               { ...interest, id: generateId() },
             ],
-          }
+          },
+          isDirty: true
         })),
       
       updateInterest: (id, interest) => 
@@ -306,7 +456,8 @@ export const useCVStore = create<CVState>()(
             interests: state.data.interests.map((i) => 
               i.id === id ? { ...i, ...interest } : i
             ),
-          }
+          },
+          isDirty: true
         })),
       
       removeInterest: (id) => 
@@ -314,7 +465,8 @@ export const useCVStore = create<CVState>()(
           data: {
             ...state.data,
             interests: state.data.interests.filter((i) => i.id !== id),
-          }
+          },
+          isDirty: true
         })),
       
       addReference: (reference) => 
@@ -325,7 +477,8 @@ export const useCVStore = create<CVState>()(
               ...state.data.references,
               { ...reference, id: generateId() },
             ],
-          }
+          },
+          isDirty: true
         })),
       
       updateReference: (id, reference) => 
@@ -335,16 +488,55 @@ export const useCVStore = create<CVState>()(
             references: state.data.references.map((ref) => 
               ref.id === id ? { ...ref, ...reference } : ref
             ),
-          }
+          },
+          isDirty: true
         })),
       
-      removeReference: (id) => 
+      removeReference: (id) =>
         set((state) => ({
           data: {
             ...state.data,
             references: state.data.references.filter((ref) => ref.id !== id),
-          }
+          },
+          isDirty: true
         })),
+
+      // Section settings actions
+      updateSectionSettings: (settings) =>
+        set((state) => {
+          const currentSettings = state.data.sectionSettings || initialSectionSettings;
+
+          return {
+            data: {
+              ...state.data,
+              sectionSettings: {
+                ...currentSettings,
+                ...settings,
+              },
+            },
+            isDirty: true
+          };
+        }),
+
+      toggleSkillsProficiencyLevels: () =>
+        set((state) => {
+          const currentSettings = state.data.sectionSettings || initialSectionSettings;
+          const currentSkillsSettings = currentSettings.skills || { showProficiencyLevels: false };
+
+          return {
+            data: {
+              ...state.data,
+              sectionSettings: {
+                ...currentSettings,
+                skills: {
+                  ...currentSkillsSettings,
+                  showProficiencyLevels: !currentSkillsSettings.showProficiencyLevels,
+                },
+              },
+            },
+            isDirty: true
+          };
+        }),
     }),
     {
       name: 'cv-storage',

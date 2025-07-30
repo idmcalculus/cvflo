@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useCVStore } from '../../store/cvStore';
 import { WorkExperience } from '../../types/cv.types';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
-import QuillEditor from '../QuillEditor';
+import RichTextEditor from '../RichTextEditor';
 
 type WorkExperienceFormData = Omit<WorkExperience, 'id'>;
 
@@ -158,7 +158,7 @@ const WorkExperienceForm: React.FC = () => {
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description
           </label>
-          <QuillEditor
+          <RichTextEditor
             value={watch('description')}
             onChange={(content) => setValue('description', content)}
             className="bg-white"

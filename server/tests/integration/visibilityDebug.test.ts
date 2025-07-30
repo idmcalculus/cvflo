@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test';
-import { TemplateService } from '../../src/services/templateService.ts';
+import { HandlebarsTemplateService } from '../../src/services/handlebarsTemplateService.ts';
 import { DataFilterService } from '../../src/services/dataFilterService.ts';
 import { CVData, SectionVisibility } from '../../src/types/cv.ts';
 
@@ -25,7 +25,7 @@ describe('Visibility Debug', () => {
   });
 
   it('should debug visibility behavior', async () => {
-    const templateService = new TemplateService();
+    const templateService = new HandlebarsTemplateService();
     templateService.clearCache(); // Clear template cache to ensure fresh templates
     const dataFilterService = new DataFilterService();
     
@@ -79,7 +79,7 @@ describe('Visibility Debug', () => {
     console.log('summary data:', filteredData1.summary);
     console.log('workExperience data:', filteredData1.workExperience);
 
-    const html1 = await templateService.renderCV('classic', mockData, visibility1);
+    const html1 = await templateService.renderCV('classic-0', mockData, visibility1);
     console.log('=== Test 1: Summary visible, work experience hidden ===');
     console.log('Summary should be visible:', html1.includes('Test summary'));
     console.log('Work experience should be hidden:', !html1.includes('Developer'));
@@ -97,7 +97,7 @@ describe('Visibility Debug', () => {
       references: true
     };
 
-    const html2 = await templateService.renderCV('classic', mockData, visibility2);
+    const html2 = await templateService.renderCV('classic-0', mockData, visibility2);
     console.log('\n=== Test 2: Summary hidden, work experience visible ===');
     console.log('Summary should be hidden:', !html2.includes('Test summary'));
     console.log('Work experience should be visible:', html2.includes('Developer'));
@@ -117,7 +117,7 @@ describe('Visibility Debug', () => {
       references: true
     };
 
-    const html3 = await templateService.renderCV('classic', mockData, visibility3);
+    const html3 = await templateService.renderCV('classic-0', mockData, visibility3);
     console.log('\n=== Test 3: Both hidden ===');
     console.log('Summary should be hidden:', !html3.includes('Test summary'));
     console.log('Work experience should be hidden:', !html3.includes('Developer'));

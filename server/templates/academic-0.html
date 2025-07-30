@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{personalInfo.firstName}} {{personalInfo.lastName}} - Resume</title>
+		<title>{{personalInfo.firstName}}{{#if personalInfo.middleName}} {{personalInfo.middleName}}{{/if}} {{personalInfo.lastName}} - Resume</title>
 		<script src="https://cdn.tailwindcss.com"></script>
 		<style>
 			/* Import Inter and Lora fonts for a closer match to typical resume styles */
@@ -46,6 +46,23 @@
 
 			ul ul ul {
 				list-style-type: square;
+			}
+
+			@page {
+				margin: 0.4in 0.5in;
+				size: A4;
+			}
+
+			@page :first {
+				margin-top: 0.4in;
+			}
+
+			@page :left {
+				margin-top: 0.6in;
+			}
+
+			@page :right {
+				margin-top: 0.6in;
 			}
 
 			/* Custom style for section titles to match the PDF's appearance */
@@ -97,28 +114,132 @@
 					background-color: #ffffff; /* White background for printing */
 					font-size: 9.5pt; /* Base font size for print */
 					color: #000000; /* Ensure text is black for print */
+					margin: 0 !important;
+					padding: 0 !important;
 				}
 				.container-resume {
 					max-width: 100% !important;
-					padding: 0.5in !important; /* Standard resume margins */
-					margin: 0 auto !important;
+					width: 100% !important;
+					padding: 0 !important; /* Remove padding to allow @page margins to control spacing */
+					margin: 0 !important;
 					box-shadow: none !important;
 					border: none !important;
+					min-height: 100vh; /* Ensure full page height utilization */
 				}
 				/* Adjust font sizes for print to match typical resume typography */
 				.print-name { font-size: 22pt !important; }
 				.print-job-title-header { font-size: 13pt !important; }
 				.print-contact-info { font-size: 8.5pt !important; }
-				.section-title { font-size: 9pt !important; margin-bottom: 0.4rem !important; border-color: #000000 !important; color: #000000 !important;}
+				.section-title { 
+					font-size: 9pt !important; 
+					margin-bottom: 0.4rem !important; 
+					margin-top: 0.5rem !important;
+					border-color: #000000 !important; 
+					color: #000000 !important;
+					page-break-after: avoid !important;
+				}
 				.print-item-title { font-size: 10.5pt !important; color: #000000 !important;}
 				.print-date-text { font-size: 8.5pt !important; color: #333333 !important;}
 				.print-body-text, .custom-list li { font-size: 9pt !important; line-height: 1.35 !important; color: #111111 !important;}
 				.print-tools-skills, .print-links-text { font-size: 8pt !important; line-height: 1.3 !important; color: #222222 !important;}
 				a { color: #0000EE !important; text-decoration: underline !important; } /* Standard print link style */
 
-				/* Attempt to prevent elements from breaking across pages */
-				.print-break-inside-avoid { break-inside: avoid; }
-				section { break-inside: avoid-page; } /* Try to keep sections on one page if possible */
+				/* Enhanced page break control */
+				header { 
+					break-inside: avoid !important;
+					page-break-after: avoid !important;
+				}
+				
+				/* Allow most sections to break naturally */
+				section {
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Small sections should stay together */
+				section:not(.employment-section):not(.projects-section):not(.education-section) {
+					break-inside: avoid;
+					page-break-inside: avoid;
+				}
+				
+				/* Large sections can break naturally */
+				section.employment-section,
+				section.projects-section,
+				section.education-section {
+					break-inside: auto;
+					page-break-inside: auto;
+				}
+				
+				/* Allow employment and project items to break across pages */
+				.employment-section .section-item,
+				.projects-section .section-item {
+					break-inside: auto;
+					page-break-inside: auto;
+					margin-bottom: 0.6rem !important;
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Education items should stay together (they're typically shorter) */
+				.education-section .section-item {
+					break-inside: avoid;
+					page-break-inside: avoid;
+					margin-bottom: 0.6rem !important;
+				}
+				
+				/* Keep section titles with at least some content */
+				.section-title {
+					break-after: avoid;
+					page-break-after: avoid;
+					orphans: 2;
+				}
+				
+				/* Ensure first item after section title stays with title */
+				.section-title + * {
+					page-break-before: avoid !important;
+					break-before: avoid !important;
+				}
+				
+				/* Allow content within items to break naturally */
+				.section-item .content-grid {
+					break-inside: auto;
+					page-break-inside: auto;
+				}
+				
+				/* Allow descriptions and lists to break across pages */
+				.section-item .print-body-text,
+				.section-item ul,
+				.section-item ol,
+				.section-item p {
+					break-inside: auto;
+					page-break-inside: auto;
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Keep list items reasonably together */
+				.section-item li {
+					break-inside: avoid;
+					page-break-inside: avoid;
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Keep job title and company with at least one line of description */
+				.title-col h3 {
+					break-after: avoid;
+					page-break-after: avoid;
+					orphans: 2;
+				}
+				
+				/* Optimize spacing between sections */
+				section:not(:first-child) {
+					margin-top: 0.8rem !important;
+				}
+				
+				section:last-child {
+					margin-bottom: 0 !important;
+				}
 			}
 		</style>
 		<script>
@@ -141,11 +262,11 @@
 	</head>
 	<body class="print:bg-white">
 
-		<div class="container-resume mx-auto p-6 sm:p-8 md:p-10 max-w-3xl bg-white shadow-xl print:shadow-none print:border-none my-8 print:my-0">
+		<div class="container-resume w-full bg-white p-4 sm:p-6 md:p-8">
 			<!-- Header -->
 			{{#if personalInfo.firstName}}
-				<header class="text-center mb-6 print-break-inside-avoid">
-					<h1 class="font-lora text-3xl sm:text-4xl font-bold text-gray-900 print-name">{{personalInfo.firstName}} {{personalInfo.lastName}}</h1>
+				<header class="text-center mb-6">
+					<h1 class="font-lora text-3xl sm:text-4xl font-bold text-gray-900 print-name">{{personalInfo.firstName}}{{#if personalInfo.middleName}} {{personalInfo.middleName}}{{/if}} {{personalInfo.lastName}}</h1>
 					{{#if personalInfo.title}}
 						<p class="text-lg sm:text-xl text-gray-700 print-job-title-header">{{personalInfo.title}}</p>
 					{{/if}}
@@ -156,31 +277,52 @@
 			{{/if}}
 
 			<!-- Links Section -->
-			{{#if personalInfo.linkedin}}
-				<section class="mb-5 print-break-inside-avoid">
+			{{#if (or personalInfo.linkedin personalInfo.website personalInfo.github personalInfo.x personalInfo.instagram personalInfo.customFields)}}
+									<section class="mb-3">
 					<h2 class="section-title">Links</h2>
 					<p class="text-sm text-gray-700 print-links-text">
 						{{#if personalInfo.linkedin}}
-							<a href="{{personalInfo.linkedin}}" class="text-blue-600 hover:underline">LinkedIn</a>{{#if personalInfo.website}},{{/if}}
+							<a href="{{personalInfo.linkedin}}" class="text-blue-600 hover:underline">LinkedIn</a>
 						{{/if}}
 						{{#if personalInfo.website}}
-							<a href="{{personalInfo.website}}" class="text-blue-600 hover:underline">Website</a>
+							{{#if personalInfo.linkedin}}, {{/if}}<a href="{{personalInfo.website}}" class="text-blue-600 hover:underline">Website</a>
+						{{/if}}
+						{{#if personalInfo.github}}
+							{{#if (or personalInfo.linkedin personalInfo.website)}}, {{/if}}<a href="{{personalInfo.github}}" class="text-blue-600 hover:underline">GitHub</a>
+						{{/if}}
+						{{#if personalInfo.x}}
+							{{#if (or personalInfo.linkedin personalInfo.website personalInfo.github)}}, {{/if}}<a href="{{personalInfo.x}}" class="text-blue-600 hover:underline">X (Twitter)</a>
+						{{/if}}
+						{{#if personalInfo.instagram}}
+							{{#if (or personalInfo.linkedin personalInfo.website personalInfo.github personalInfo.x)}}, {{/if}}<a href="{{personalInfo.instagram}}" class="text-blue-600 hover:underline">Instagram</a>
+						{{/if}}
+						{{#if personalInfo.customFields}}
+							{{#each personalInfo.customFields}}
+								{{#if this.label}}{{#if this.value}}
+									{{#if (or ../personalInfo.linkedin ../personalInfo.website ../personalInfo.github ../personalInfo.x ../personalInfo.instagram)}}
+										, {{#if (isUrl this.value)}}
+											<a href="{{this.value}}" class="text-blue-600 hover:underline">{{this.label}}</a>
+										{{else}}
+											<span class="text-blue-600">{{this.label}}: {{this.value}}</span>
+										{{/if}}
+									{{else}}
+										{{#unless @first}}, {{/unless}}{{#if (isUrl this.value)}}
+											<a href="{{this.value}}" class="text-blue-600 hover:underline">{{this.label}}</a>
+										{{else}}
+											<span class="text-blue-600">{{this.label}}: {{this.value}}</span>
+										{{/if}}
+									{{/if}}
+								{{/if}}{{/if}}
+							{{/each}}
 						{{/if}}
 					</p>
 				</section>
-			{{else}}{{#if personalInfo.website}}
-				<section class="mb-5 print-break-inside-avoid">
-					<h2 class="section-title">Links</h2>
-					<p class="text-sm text-gray-700 print-links-text">
-						<a href="{{personalInfo.website}}" class="text-blue-600 hover:underline">Website</a>
-					</p>
-				</section>
-			{{/if}}{{/if}}
+			{{/if}}
 
 			<!-- Profile/Summary -->
 			{{#if visibility.summary}}
 				{{#if summary}}
-					<section class="mb-5 print-break-inside-avoid">
+										<section class="mb-3">
 						<h2 class="section-title">Profile</h2>
 						<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{{summary}}}</div>
 					</section>
@@ -189,23 +331,23 @@
 
 			<!-- Employment History -->
 			{{#if visibility.workExperience}}
-				{{#if workExperience.length}}
-					<section class="mb-5">
+				{{#if (hasItems workExperience)}}
+					<section class="mb-4 employment-section">
 						<h2 class="section-title">Employment History</h2>
 
 						{{#each workExperience}}
-							<div class="mb-4 print-break-inside-avoid">
+							<div class="mb-2 section-item">
 								<div class="content-grid">
-									<div class="text-xs font-medium text-gray-500 date-col print-date-text">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+									<div class="text-xs font-medium text-gray-500 date-col print-date-text">{{formatDate startDate}} - {{#if current}}Present{{else}}{{formatDate endDate}}{{/if}}</div>
 									<div class="title-col">
-										<h3 class="text-base font-semibold text-gray-800 print-item-title">{{this.position}}, {{this.company}}{{#if this.location}} <span class="text-xs font-normal text-gray-500 align-middle ml-1">{{this.location}}</span>{{/if}}</h3>
+										<h3 class="text-base font-semibold text-gray-800 print-item-title">{{position}}, {{company}}{{#if location}} <span class="text-xs font-normal text-gray-500 align-middle ml-1">{{location}}</span>{{/if}}</h3>
 									</div>
 								</div>
-								{{#if this.description}}
+								{{#if description}}
 									<div class="content-grid">
 										<div></div>
 										<div>
-											<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{{this.description}}}</div>
+											<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{{description}}}</div>
 										</div>
 									</div>
 								{{/if}}
@@ -217,38 +359,38 @@
 
 			<!-- Personal Projects -->
 			{{#if visibility.projects}}
-				{{#if projects.length}}
-					<section class="mb-5">
+				{{#if (hasItems projects)}}
+					<section class="mb-4 projects-section">
 						<h2 class="section-title">Personal Projects</h2>
 
 						{{#each projects}}
-							<div class="mb-4 print-break-inside-avoid">
+							<div class="mb-2 section-item">
 								<div class="content-grid">
-									<div class="text-xs font-medium text-gray-500 date-col print-date-text">{{this.formattedStartDate}}{{#unless this.current}} - {{this.formattedEndDate}}{{/unless}}</div>
+									<div class="text-xs font-medium text-gray-500 date-col print-date-text">{{formatDate startDate}}{{#unless this.current}} - {{formatDate endDate}}{{/unless}}</div>
 									<div class="title-col">
-										<h3 class="text-base font-semibold text-gray-800 print-item-title">{{this.title}}</h3>
+										<h3 class="text-base font-semibold text-gray-800 print-item-title">{{title}}</h3>
 									</div>
 								</div>
 								<div class="content-grid">
 									<div></div>
 									<div>
-										{{#if this.description}}
-											<div class="text-sm text-gray-700 mb-1 leading-relaxed print-body-text">{{{this.description}}}</div>
+										{{#if description}}
+											<div class="text-sm text-gray-700 mb-1 leading-relaxed print-body-text">{{{description}}}</div>
 										{{/if}}
-										{{#if this.liveUrl}}
+										{{#if liveUrl}}
 											<p class="text-sm text-gray-700 mb-1 leading-relaxed print-links-text">
 												<strong class="font-semibold">Links:</strong> 
-												<a href="{{this.liveUrl}}" class="text-blue-600 hover:underline">App</a>{{#if this.githubUrl}} | <a href="{{this.githubUrl}}" class="text-blue-600 hover:underline">GitHub</a>{{/if}}
+												<a href="{{liveUrl}}" class="text-blue-600 hover:underline">App</a>{{#if githubUrl}} | <a href="{{githubUrl}}" class="text-blue-600 hover:underline">GitHub</a>{{/if}}
 											</p>
-										{{else}}{{#if this.githubUrl}}
+										{{else}}{{#if githubUrl}}
 											<p class="text-sm text-gray-700 mb-1 leading-relaxed print-links-text">
 												<strong class="font-semibold">Links:</strong> 
-												<a href="{{this.githubUrl}}" class="text-blue-600 hover:underline">GitHub</a>
+												<a href="{{githubUrl}}" class="text-blue-600 hover:underline">GitHub</a>
 											</p>
 										{{/if}}{{/if}}
-										{{#if this.technologies.length > 0}}
+										{{#if (hasItems technologies)}}
 											<p class="text-xs mt-1 text-gray-600 leading-relaxed print-tools-skills">
-												<strong class="font-semibold">Tools/Skills:</strong> {{#each this.technologies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+												<strong class="font-semibold">Tools/Skills:</strong> {{technologiesList technologies ", "}}
 											</p>
 										{{/if}}
 									</div>
@@ -261,18 +403,18 @@
 
 			<!-- Education and Certifications -->
 			{{#if visibility.education}}
-				{{#if education.length}}
-					<section class="print-break-inside-avoid">
+				{{#if (hasItems education)}}
+					<section class="education-section">
 						<h2 class="section-title">Education and Certifications</h2>
 						
 						{{#each education}}
-							<div class="content-grid-education mb-1.5 print-break-inside-avoid">
-								<p class="text-sm text-gray-800 print-body-text">{{this.degree}}{{#if this.field}} in {{this.field}}{{/if}}, {{this.institution}}{{#if this.location}} ({{this.location}}){{/if}}</p>
-								<p class="text-xs text-gray-500 text-right print-date-text pt-px">{{this.formattedStartDate}}{{#unless this.current}} - {{this.formattedEndDate}}{{/unless}}</p>
+													<div class="content-grid-education mb-1 section-item">
+								<p class="text-sm text-gray-800 print-body-text">{{degree}}{{#if field}} in {{field}}{{/if}}, {{institution}}{{#if location}} ({{location}}){{/if}}</p>
+								<p class="text-xs text-gray-500 text-right print-date-text pt-px">{{formatDate startDate}}{{#unless this.current}} - {{formatDate endDate}}{{/unless}}</p>
 							</div>
-							{{#if this.description}}
+							{{#if description}}
 								<div class="content-grid-education mb-1.5">
-									<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{{this.description}}}</div>
+									<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{{description}}}</div>
 									<div></div>
 								</div>
 							{{/if}}
@@ -283,23 +425,28 @@
 
 			<!-- Skills -->
 			{{#if visibility.skills}}
-				{{#if skills.length}}
-					<section class="mb-5 print-break-inside-avoid">
+				{{#if (hasItems skills)}}
+					<section class="mb-3">
 						<h2 class="section-title">Technical Skills</h2>
-						<div class="text-sm text-gray-700 print-body-text">
-							{{#each skills}}{{this.name}}{{#if this.level}} ({{this.level}}/5){{/if}}{{#unless @last}}, {{/unless}}{{/each}}
-						</div>
+						{{#each (groupSkills skills)}}
+							<div class="mb-2">
+								<div class="text-sm text-gray-700 print-body-text">
+									<strong>{{category}}:</strong>
+									{{#each skills}}{{name}}{{#if ../../../sectionSettings.skills.showProficiencyLevels}}{{#if level}} ({{level}}/5){{/if}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}
+								</div>
+							</div>
+						{{/each}}
 					</section>
 				{{/if}}
 			{{/if}}
 
 			<!-- Interests -->
 			{{#if visibility.interests}}
-				{{#if interests.length}}
-					<section class="mb-5 print-break-inside-avoid">
+				{{#if (hasItems interests)}}
+										<section class="mb-3">
 						<h2 class="section-title">Interests</h2>
 						<div class="text-sm text-gray-700 print-body-text">
-							{{#each interests}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}
+							{{join interests ", "}}
 						</div>
 					</section>
 				{{/if}}
@@ -307,16 +454,16 @@
 
 			<!-- References -->
 			{{#if visibility.references}}
-				{{#if references.length}}
-					<section class="print-break-inside-avoid">
+				{{#if (hasItems references)}}
+					<section class="references-section">
 						<h2 class="section-title">References</h2>
 						{{#each references}}
-							<div class="content-grid-education mb-1.5 print-break-inside-avoid">
+													<div class="content-grid-education mb-1 section-item">
 								<div>
-									<p class="text-sm text-gray-800 print-body-text font-semibold">{{this.name}}</p>
-									<p class="text-sm text-gray-700 print-body-text">{{this.position}}{{#if this.company}} at {{this.company}}{{/if}}</p>
-									{{#if this.email}}<p class="text-xs text-gray-600 print-tools-skills">{{this.email}}</p>{{/if}}
-									{{#if this.phone}}<p class="text-xs text-gray-600 print-tools-skills">{{this.phone}}</p>{{/if}}
+									<p class="text-sm text-gray-800 print-body-text font-semibold">{{name}}</p>
+									<p class="text-sm text-gray-700 print-body-text">{{position}}{{#if this.company}} at {{company}}{{/if}}</p>
+									{{#if email}}<p class="text-xs text-gray-600 print-tools-skills">{{email}}</p>{{/if}}
+									{{#if phone}}<p class="text-xs text-gray-600 print-tools-skills">{{phone}}</p>{{/if}}
 								</div>
 								<div></div>
 							</div>

@@ -1,0 +1,427 @@
+{% load cv_filters %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if cv_data.personal_info.first_name %}{{ cv_data.personal_info.first_name }}{% if cv_data.personal_info.middle_name %} {{ cv_data.personal_info.middle_name }}{% endif %} {{ cv_data.personal_info.last_name }}{% endif %} - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+      body {
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        line-height: 1.5;
+        scroll-behavior: smooth;
+        overflow-y: auto;
+        background-color: #111827;
+        color: white;
+        padding: 0.5rem;
+      }
+
+      /* List styling for proper bullet points and numbered lists */
+      ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      li {
+        margin: 0.25rem 0;
+        line-height: 1.5;
+      }
+
+      ul ul {
+        list-style-type: circle;
+      }
+
+      ul ul ul {
+        list-style-type: square;
+      }
+
+      .cv-content {
+        width: 100%;
+        margin: 0;
+        background-color: #1f2937;
+        overflow: hidden;
+      }
+
+      .header-section {
+        background: linear-gradient(to right, #9333ea, #ec4899);
+        color: white;
+        padding: 2rem;
+      }
+
+      .header-center {
+        text-align: center;
+      }
+
+      .header-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+      }
+
+      .header-subtitle {
+        font-size: 1.5rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+        line-height: 1.75;
+      }
+
+      .sidebar {
+        padding: 2rem;
+      }
+
+      .sidebar-section {
+        background-color: #374151;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .sidebar-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #a855f7;
+      }
+
+      .contact-info {
+        font-size: 0.875rem;
+      }
+
+      .contact-info > div {
+        margin-bottom: 0.5rem;
+      }
+
+      .skills-category {
+        margin-bottom: 1rem;
+      }
+
+      .skills-category-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #d8b4fe;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .skill-item {
+        margin-bottom: 0.75rem;
+      }
+
+      .skill-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+      }
+
+      .skill-name {
+        font-size: 0.875rem;
+      }
+
+      .skill-level {
+        font-size: 0.75rem;
+        color: #a855f7;
+      }
+
+      .skill-bar {
+        width: 100%;
+        background-color: #4b5563;
+        border-radius: 9999px;
+        height: 0.5rem;
+      }
+
+      .skill-progress {
+        background: linear-gradient(to right, #a855f7, #ec4899);
+        height: 0.5rem;
+        border-radius: 9999px;
+      }
+
+      .main-content {
+        padding: 2rem;
+      }
+
+      .content-section {
+        margin-bottom: 2rem;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #a855f7;
+        margin-bottom: 1rem;
+        position: relative;
+      }
+
+      .section-title::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 4rem;
+        height: 0.25rem;
+        background: linear-gradient(to right, #3b82f6, #8b5cf6);
+        border-radius: 0.125rem;
+      }
+
+      @page {
+        margin: 0;
+        size: A4;
+      }
+
+      @media print {
+        body {
+          font-size: 10pt;
+          background-color: #111827;
+          color: white;
+          margin: 0;
+          padding: 0;
+        }
+
+        .cv-content {
+          background-color: #1f2937;
+          width: 100%;
+          margin: 0;
+        }
+
+        .section-title {
+          font-size: 14pt;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cv-content">
+      <!-- Header -->
+      {% if cv_data.personal_info.first_name %}
+        <div class="header-section">
+          <div class="header-center">
+            <h1 class="header-title">
+              {{ cv_data.personal_info.first_name }}{% if cv_data.personal_info.middle_name %} {{ cv_data.personal_info.middle_name }}{% endif %} {{ cv_data.personal_info.last_name }}
+            </h1>
+            {% if cv_data.personal_info.title %}
+              <h2 class="header-subtitle">{{ cv_data.personal_info.title }}</h2>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Content with two-column layout -->
+      <div style="padding: 2rem;">
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+          <!-- Left sidebar -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Contact Info -->
+            <div class="sidebar-section">
+              <h3 class="sidebar-title">Contact</h3>
+              <div class="contact-info">
+                {% if cv_data.personal_info.email %}<div>{{ cv_data.personal_info.email }}</div>{% endif %}
+                {% if cv_data.personal_info.phone %}<div>{{ cv_data.personal_info.phone }}</div>{% endif %}
+                {% if cv_data.personal_info.address %}
+                  <div>
+                    {{ cv_data.personal_info.address }}
+                    {% if cv_data.personal_info.city %}, {{ cv_data.personal_info.city }}{% endif %}
+                  </div>
+                {% endif %}
+                {% if cv_data.personal_info.linkedin %}
+                  <div style="margin-bottom: 0.5rem;">
+                    <strong>LinkedIn:</strong> <a href="{{ cv_data.personal_info.linkedin }}" style="color: #a855f7; text-decoration: underline;">{{ cv_data.personal_info.linkedin }}</a>
+                  </div>
+                {% endif %}
+                {% if cv_data.personal_info.github %}
+                  <div style="margin-bottom: 0.5rem;">
+                    <strong>GitHub:</strong> <a href="{{ cv_data.personal_info.github }}" style="color: #a855f7; text-decoration: underline;">{{ cv_data.personal_info.github }}</a>
+                  </div>
+                {% endif %}
+                {% if cv_data.personal_info.x %}
+                  <div style="margin-bottom: 0.5rem;">
+                    <strong>X (Twitter):</strong> <a href="{{ cv_data.personal_info.x }}" style="color: #a855f7; text-decoration: underline;">{{ cv_data.personal_info.x }}</a>
+                  </div>
+                {% endif %}
+                {% if cv_data.personal_info.instagram %}
+                  <div style="margin-bottom: 0.5rem;">
+                    <strong>Instagram:</strong> <a href="{{ cv_data.personal_info.instagram }}" style="color: #a855f7; text-decoration: underline;">{{ cv_data.personal_info.instagram }}</a>
+                  </div>
+                {% endif %}
+                {% if cv_data.personal_info.custom_fields %}
+                  {% for field in cv_data.personal_info.custom_fields %}
+                    {% if field.label and field.value %}
+                      <div style="margin-bottom: 0.5rem;">
+                        <strong>{{ field.label }}:</strong> 
+                        {% if field.value|is_url %}
+                          <a href="{{ field.value }}" style="color: #a855f7; text-decoration: underline;">{{ field.value }}</a>
+                        {% else %}
+                          {{ field.value }}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Skills -->
+            {% if visibility.skills and cv_data.skills %}
+              <div class="sidebar-section">
+                <h3 class="sidebar-title">Skills</h3>
+                {% regroup cv_data.skills by category as skill_groups %}
+                {% for group in skill_groups %}
+                  <div class="skills-category">
+                    <h4 class="skills-category-title">{{ group.grouper }}</h4>
+                    {% for skill in group.list %}
+                      <div class="skill-item">
+                        <div class="skill-header">
+                          <span class="skill-name">{{ skill.name }}</span>
+                          {% if cv_data.section_settings.skills.show_proficiency_levels and skill.level %}
+                            <span class="skill-level">{{ skill.level }}/5</span>
+                          {% endif %}
+                        </div>
+                        {% if cv_data.section_settings.skills.show_proficiency_levels and skill.level %}
+                          <div class="skill-bar">
+                            <div class="skill-progress" style="width: {{ skill.level|mul:20 }}%;"></div>
+                          </div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Main content -->
+          <div style="display: flex; flex-direction: column; gap: 2rem;">
+            {% if visibility.summary and cv_data.summary %}
+              <section>
+                <h3 class="section-title">About</h3>
+                <p style="color: #d1d5db; line-height: 1.625;">{{ cv_data.summary|safe }}</p>
+              </section>
+            {% endif %}
+
+            {% if visibility.work_experience and cv_data.work_experiences %}
+              <section>
+                <h3 class="section-title">Experience</h3>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  {% for work in cv_data.work_experiences %}
+                    <div style="border-left: 4px solid #a855f7; padding-left: 1.5rem;">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <div>
+                          <h4 style="font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 0.25rem;">{{ work.position }}</h4>
+                          <p style="color: #a855f7; font-weight: 600;">{{ work.company }}</p>
+                        </div>
+                        <span style="color: #9ca3af; font-size: 0.875rem;">{{ work.start_date|date:"M Y" }} - {% if work.current %}Present{% else %}{{ work.end_date|date:"M Y" }}{% endif %}</span>
+                      </div>
+                      {% if work.description %}
+                        <div style="color: #d1d5db; line-height: 1.625;">{{ work.description|safe }}</div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
+
+            {% if visibility.projects and cv_data.projects %}
+              <section>
+                <h3 class="section-title">Projects</h3>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  {% for project in cv_data.projects %}
+                    <div style="border-left: 4px solid #a855f7; padding-left: 1.5rem;">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <div>
+                          <h4 style="font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 0.25rem;">
+                            {% if project.live_url %}
+                              <a href="{{ project.live_url }}" style="color: #a855f7; text-decoration: underline;">{{ project.title }}</a>
+                            {% else %}
+                              {{ project.title }}
+                            {% endif %}
+                          </h4>
+                          {% if project.technologies %}
+                            <div style="margin-bottom: 0.5rem;">
+                              {% for tech in project.technologies %}
+                                <span style="background: linear-gradient(to right, #a855f7, #ec4899); color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; margin-right: 0.5rem; display: inline-block;">{{ tech }}</span>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+                        <span style="color: #9ca3af; font-size: 0.875rem;">{{ project.start_date|date:"M Y" }} - {% if project.current %}Ongoing{% else %}{{ project.end_date|date:"M Y" }}{% endif %}</span>
+                      </div>
+                      {% if project.description %}
+                        <div style="color: #d1d5db; line-height: 1.625; margin-bottom: 0.5rem;">{{ project.description|safe }}</div>
+                      {% endif %}
+                      {% if project.github_url %}
+                        <div style="font-size: 0.875rem; color: #9ca3af;">
+                          <a href="{{ project.github_url }}" style="color: #a855f7; text-decoration: underline;">View on GitHub</a>
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
+
+            {% if visibility.education and cv_data.educations %}
+              <section>
+                <h3 class="section-title">Education</h3>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  {% for education in cv_data.educations %}
+                    <div style="border-left: 4px solid #a855f7; padding-left: 1.5rem;">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <div>
+                          <h4 style="font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 0.25rem;">{{ education.institution }}</h4>
+                          <p style="color: #a855f7; font-weight: 600;">{{ education.degree }}{% if education.field %} in {{ education.field }}{% endif %}</p>
+                        </div>
+                        <span style="color: #9ca3af; font-size: 0.875rem;">{{ education.start_date|date:"M Y" }} - {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}</span>
+                      </div>
+                      {% if education.description %}
+                        <div style="color: #d1d5db; line-height: 1.625;">{{ education.description|safe }}</div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
+
+            {% if visibility.interests and cv_data.interests %}
+              <section>
+                <h3 class="section-title">Interests</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                  {% for interest in cv_data.interests %}
+                    <span style="background: linear-gradient(to right, #a855f7, #ec4899); color: white; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">{{ interest.name }}</span>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
+
+            {% if visibility.references and cv_data.references %}
+              <section>
+                <h3 class="section-title">References</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                  {% for reference in cv_data.references %}
+                    <div style="border-left: 4px solid #a855f7; padding-left: 1.5rem;">
+                      <h4 style="font-size: 1.125rem; font-weight: 700; color: white; margin-bottom: 0.25rem;">{{ reference.name }}</h4>
+                      <p style="color: #a855f7; font-weight: 600; margin-bottom: 0.5rem;">{{ reference.position }}{% if reference.company %} at {{ reference.company }}{% endif %}</p>
+                      {% if reference.email %}<div style="color: #d1d5db; font-size: 0.875rem;">{{ reference.email }}</div>{% endif %}
+                      {% if reference.phone %}<div style="color: #d1d5db; font-size: 0.875rem;">{{ reference.phone }}</div>{% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

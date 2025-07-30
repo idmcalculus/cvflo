@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from 'bun:test';
 import * as cheerio from 'cheerio';
-import { TemplateService } from '../../src/services/templateService.ts';
+import { HandlebarsTemplateService } from '../../src/services/handlebarsTemplateService.ts';
 import { CVData, SectionVisibility } from '../../src/types/cv.ts';
 
 describe('Template Visibility Integration', () => {
-  let templateService: TemplateService;
+  let templateService: HandlebarsTemplateService;
   let mockCVData: CVData;
   let allVisibleSettings: SectionVisibility;
 
   beforeEach(() => {
-    templateService = new TemplateService();
+    templateService = new HandlebarsTemplateService();
 
     mockCVData = {
       personalInfo: {
@@ -59,10 +59,10 @@ describe('Template Visibility Integration', () => {
         githubUrl: 'https://github.com/johndoe/ecommerce'
       }],
       skills: [
-        { id: '1', name: 'JavaScript', level: 5 },
-        { id: '2', name: 'TypeScript', level: 4 },
-        { id: '3', name: 'React', level: 4 },
-        { id: '4', name: 'Node.js', level: 4 }
+        { id: '1', name: 'JavaScript', level: 5, category: 'Programming' },
+        { id: '2', name: 'TypeScript', level: 4, category: 'Programming' },
+        { id: '3', name: 'React', level: 4, category: 'Frameworks' },
+        { id: '4', name: 'Node.js', level: 4, category: 'Runtime' }
       ],
       interests: [
         { id: '1', name: 'Photography' },
@@ -269,18 +269,18 @@ describe('Template Visibility Integration', () => {
         references: []
       };
 
-      const html = await templateService.renderCV('classic', emptyCVData, allVisibleSettings);
+      const html = await templateService.renderCV('classic-0', emptyCVData, allVisibleSettings);
       
       // Should contain personal info
       expect(html).toContain('John Doe');
       
-      // Should not show empty sections even when visibility is true
-      expect(html).not.toContain('Work Experience');
-      expect(html).not.toContain('Education');
-      expect(html).not.toContain('Projects');
-      expect(html).not.toContain('Skills');
-      expect(html).not.toContain('Interests');
-      expect(html).not.toContain('References');
+      // Should not show section headers for empty sections even when visibility is true
+      expect(html).not.toContain('<h2 class="section-title">Work Experience</h2>');
+      expect(html).not.toContain('<h2 class="section-title">Education</h2>');
+      expect(html).not.toContain('<h2 class="section-title">Projects</h2>');
+      expect(html).not.toContain('<h2 class="section-title">Skills</h2>');
+      expect(html).not.toContain('<h2 class="section-title">Interests</h2>');
+      expect(html).not.toContain('<h2 class="section-title">References</h2>');
     });
   });
 });

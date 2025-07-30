@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{personalInfo.firstName}} {{personalInfo.lastName}} - Resume</title>
+    <title>{{personalInfo.firstName}}{{#if personalInfo.middleName}} {{personalInfo.middleName}}{{/if}} {{personalInfo.lastName}} - Resume</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@700&display=swap');
@@ -50,7 +50,7 @@
       .section-title {
         border-bottom: 2px solid #2563eb;
         padding-bottom: 4px;
-        margin-bottom: 12px;
+                margin-bottom: 8px;
         font-weight: 700;
         font-size: 16pt;
         color: #1e40af;
@@ -62,7 +62,7 @@
         grid-template-columns: 100px 1fr;
         gap: 16px;
         align-items: start;
-        margin-bottom: 12px;
+                margin-bottom: 8px;
       }
 
       .date-col {
@@ -96,6 +96,18 @@
         size: A4;
       }
 
+      @page :first {
+        margin-top: 0.4in;
+      }
+
+      @page :left {
+        margin-top: 0.6in;
+      }
+
+      @page :right {
+        margin-top: 0.6in;
+      }
+
       @media print {
         body {
           font-size: 10pt;
@@ -105,25 +117,61 @@
           box-shadow: none;
           margin: 0;
           padding: 0;
+          min-height: 100vh;
         }
         
         .section-title {
           font-size: 14pt;
+          page-break-after: avoid;
+          margin-top: 0.6rem;
         }
         
         .title-col h3 {
           font-size: 10pt;
         }
+        
+        /* Enhanced page break control */
+        header { 
+          break-inside: avoid;
+          page-break-after: avoid;
+        }
+        
+        section {
+          break-inside: avoid-page;
+          page-break-inside: avoid;
+          orphans: 3;
+          widows: 3;
+        }
+        
+        .section-item {
+          break-inside: avoid;
+          page-break-inside: avoid;
+          margin-bottom: 0.75rem;
+        }
+        
+        /* Prevent section titles from being orphaned */
+        .section-title + * {
+          page-break-before: avoid;
+        }
+        
+        /* Optimize spacing between sections */
+        section:not(:first-child) {
+          margin-top: 0.8rem;
+        }
+        
+        section:last-child {
+          margin-bottom: 0;
+        }
       }
     </style>
   </head>
-  <body class="py-8">
-    <div class="container-resume bg-white max-w-[800px] mx-auto p-10 shadow-md">
+  <body>
+    <div class="container-resume bg-white w-full p-6">
       <!-- Header -->
       {{#if personalInfo.firstName}}
-        <header class="mb-8">
+                <header class="mb-4">
           <h1 class="text-3xl font-bold font-lora mb-1">
-            {{personalInfo.firstName}} {{personalInfo.lastName}}
+            {{personalInfo.firstName}}{{#if personalInfo.middleName}} {{personalInfo.middleName}}{{/if}} {{personalInfo.lastName}}
           </h1>
           {{#if personalInfo.title}}
             <h2 class="text-xl text-gray-600 mb-4">{{personalInfo.title}}</h2>
@@ -147,6 +195,28 @@
             {{#if personalInfo.linkedin}}
               <div class="mb-2"><strong>LinkedIn:</strong> <a href="{{personalInfo.linkedin}}" class="underline">{{personalInfo.linkedin}}</a></div>
             {{/if}}
+            {{#if personalInfo.github}}
+              <div class="mb-2"><strong>GitHub:</strong> <a href="{{personalInfo.github}}" class="underline">{{personalInfo.github}}</a></div>
+            {{/if}}
+            {{#if personalInfo.x}}
+              <div class="mb-2"><strong>X (Twitter):</strong> <a href="{{personalInfo.x}}" class="underline">{{personalInfo.x}}</a></div>
+            {{/if}}
+            {{#if personalInfo.instagram}}
+              <div class="mb-2"><strong>Instagram:</strong> <a href="{{personalInfo.instagram}}" class="underline">{{personalInfo.instagram}}</a></div>
+            {{/if}}
+            {{#if personalInfo.customFields}}
+              {{#each personalInfo.customFields}}
+                {{#if this.label}}{{#if this.value}}
+                  <div class="mb-2"><strong>{{this.label}}:</strong> 
+                    {{#if (isUrl this.value)}}
+                      <a href="{{this.value}}" class="underline">{{this.value}}</a>
+                    {{else}}
+                      {{this.value}}
+                    {{/if}}
+                  </div>
+                {{/if}}{{/if}}
+              {{/each}}
+            {{/if}}
           </div>
         </header>
       {{/if}}
@@ -154,7 +224,7 @@
       <!-- Summary -->
       {{#if visibility.summary}}
         {{#if summary}}
-          <section id="summary-section" class="mb-6">
+          <section id="summary-section" class="mb-3">
             <h2 class="section-title">Summary</h2>
             <p class="text-sm">{{summary}}</p>
           </section>
@@ -163,22 +233,22 @@
 
       <!-- Work Experience -->
       {{#if visibility.workExperience}}
-        {{#if workExperience.length}}
-          <section id="experience-section" class="mb-6">
+        {{#if (hasItems workExperience)}}
+          <section id="experience-section" class="mb-3">
             <h2 class="section-title">Work Experience</h2>
             {{#each workExperience}}
-              <div class="mb-4 content-grid">
+                            <div class="mb-2 content-grid">
                 <div class="date-col text-right">
-                  <div class="text-muted-date">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
-                  {{#if this.location}}
-                    <div class="text-muted-date">{{this.location}}</div>
+                  <div class="text-muted-date">{{formatDate startDate}} - {{#if current}}Present{{else}}{{formatDate endDate}}{{/if}}</div>
+                  {{#if location}}
+                    <div class="text-muted-date">{{location}}</div>
                   {{/if}}
                 </div>
                 <div class="title-col">
-                  <h3 class="font-semibold">{{this.position}}</h3>
-                  <div class="text-gray-700 text-sm">{{this.company}}</div>
-                  {{#if this.description}}
-                    <div class="text-sm mt-1">{{{this.description}}}</div>
+                  <h3 class="font-semibold">{{position}}</h3>
+                  <div class="text-gray-700 text-sm">{{company}}</div>
+                  {{#if description}}
+                    <div class="text-sm mt-1">{{{description}}}</div>
                   {{/if}}
                 </div>
               </div>
@@ -189,34 +259,34 @@
 
       <!-- Projects -->
       {{#if visibility.projects}}
-        {{#if projects.length}}
-          <section id="projects-section" class="mb-6">
+        {{#if (hasItems projects)}}
+          <section id="projects-section" class="mb-3">
             <h2 class="section-title">Projects</h2>
             {{#each projects}}
-              <div class="mb-4 content-grid">
+              <div class="mb-2 content-grid">
                 <div class="date-col text-right">
-                  <div class="text-muted-date">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
+                  <div class="text-muted-date">{{formatDate startDate}} - {{#if current}}Present{{else}}{{formatDate endDate}}{{/if}}</div>
                 </div>
                 <div class="title-col">
                   <h3 class="font-semibold">
-                    {{#if this.liveUrl}}
-                      <a href="{{this.liveUrl}}" class="underline">{{this.title}}</a>
+                    {{#if liveUrl}}
+                      <a href="{{liveUrl}}" class="underline">{{title}}</a>
                     {{else}}
-                      {{this.title}}
+                      {{title}}
                     {{/if}}
                   </h3>
-                  {{#if this.description}}
-                    <div class="text-sm mt-1">{{{this.description}}}</div>
+                  {{#if description}}
+                    <div class="text-sm mt-1">{{{description}}}</div>
                   {{/if}}
-                  {{#if this.technologies.length > 0}}
+                  {{#if (hasItems technologies)}}
                     <div class="text-xs text-gray-600 mt-1">
-                      <strong>Technologies:</strong> 
-                      {{#each this.technologies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                      <strong>Technologies:</strong>
+                      {{technologiesList technologies ", "}}
                     </div>
                   {{/if}}
-                  {{#if this.githubUrl}}
+                  {{#if githubUrl}}
                     <div class="text-xs text-gray-600 mt-1">
-                      <strong>GitHub:</strong> <a href="{{this.githubUrl}}" class="underline">{{this.githubUrl}}</a>
+                      <strong>GitHub:</strong> <a href="{{githubUrl}}" class="underline">{{githubUrl}}</a>
                     </div>
                   {{/if}}
                 </div>
@@ -228,22 +298,22 @@
 
       <!-- Education -->
       {{#if visibility.education}}
-        {{#if education.length}}
-          <section id="education-section" class="mb-6">
+        {{#if (hasItems education)}}
+          <section id="education-section" class="mb-3">
             <h2 class="section-title">Education</h2>
             {{#each education}}
-              <div class="mb-4 content-grid">
+                            <div class="mb-2 content-grid">
                 <div class="date-col text-right">
-                  <div class="text-muted-date">{{this.formattedStartDate}} - {{#if this.current}}Present{{else}}{{this.formattedEndDate}}{{/if}}</div>
-                  {{#if this.location}}
-                    <div class="text-muted-date">{{this.location}}</div>
+                  <div class="text-muted-date">{{formatDate startDate}} - {{#if current}}Present{{else}}{{formatDate endDate}}{{/if}}</div>
+                  {{#if location}}
+                    <div class="text-muted-date">{{location}}</div>
                   {{/if}}
                 </div>
                 <div class="title-col">
-                  <h3 class="font-semibold">{{this.institution}}</h3>
-                  <div class="text-gray-700 text-sm">{{this.degree}}{{#if this.field}}, {{this.field}}{{/if}}</div>
-                  {{#if this.description}}
-                    <div class="text-sm mt-1">{{{this.description}}}</div>
+                  <h3 class="font-semibold">{{institution}}</h3>
+                  <div class="text-gray-700 text-sm">{{degree}}{{#if field}}, {{field}}{{/if}}</div>
+                  {{#if description}}
+                    <div class="text-sm mt-1">{{{description}}}</div>
                   {{/if}}
                 </div>
               </div>
@@ -254,48 +324,55 @@
 
       <!-- Skills -->
       {{#if visibility.skills}}
-        {{#if skills.length}}
-          <section id="skills-section" class="mb-6">
+        {{#if (hasItems skills)}}
+          <section id="skills-section" class="mb-3">
             <h2 class="section-title">Skills</h2>
-            <div class="flex flex-wrap">
-              {{#each skills}}
-                <div class="mr-4 mb-2">
-                  <span class="font-medium">{{this.name}}</span>
-                  {{#if this.level}}
-                    <span class="text-gray-500 text-sm"> ({{this.level}}/5)</span>
-                  {{/if}}
+            {{#each (groupSkills skills)}}
+              <div class="mb-2">
+                <h3 class="font-semibold text-gray-800">{{category}}</h3>
+                <div class="flex flex-wrap">
+                  {{#each skills}}
+                    <div class="mr-4 mb-1">
+                      <span>{{name}}</span>
+                      {{#if ../../../sectionSettings.skills.showProficiencyLevels}}
+                        {{#if level}}
+                          <span class="text-gray-500 text-xs">({{level}}/5)</span>
+                        {{/if}}
+                      {{/if}}
+                    </div>
+                  {{/each}}
                 </div>
-              {{/each}}
-            </div>
+              </div>
+            {{/each}}
           </section>
         {{/if}}
       {{/if}}
 
       <!-- Interests -->
       {{#if visibility.interests}}
-        {{#if interests.length}}
-          <section id="interests-section" class="mb-6">
+        {{#if (hasItems interests)}}
+          <section id="interests-section" class="mb-3">
             <h2 class="section-title">Interests</h2>
-            <p>{{#each interests}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+            <p>{{join interests ", "}}</p>
           </section>
         {{/if}}
       {{/if}}
 
       <!-- References -->
       {{#if visibility.references}}
-        {{#if references.length}}
+        {{#if (hasItems references)}}
           <section id="references-section">
             <h2 class="section-title">References</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               {{#each references}}
                 <div>
-                  <h3 class="font-semibold">{{this.name}}</h3>
-                  <div class="text-gray-700 text-sm">{{this.position}}{{#if this.company}}, {{this.company}}{{/if}}</div>
-                  {{#if this.email}}
-                    <div class="text-sm">{{this.email}}</div>
+                  <h3 class="font-semibold">{{name}}</h3>
+                  <div class="text-gray-700 text-sm">{{position}}{{#if company}}, {{company}}{{/if}}</div>
+                  {{#if email}}
+                    <div class="text-sm">{{email}}</div>
                   {{/if}}
-                  {{#if this.phone}}
-                    <div class="text-sm">{{this.phone}}</div>
+                  {{#if phone}}
+                    <div class="text-sm">{{phone}}</div>
                   {{/if}}
                 </div>
               {{/each}}

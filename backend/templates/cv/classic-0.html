@@ -1,0 +1,369 @@
+{% load static %}
+{% load cv_filters %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if personal_info.first_name %}{{ personal_info.first_name }}{% if personal_info.middle_name %} {{ personal_info.middle_name }}{% endif %} {{ personal_info.last_name }}{% else %}CV{% endif %} - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@700&display=swap');
+
+      body {
+        font-family: 'Inter', Arial, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        line-height: 1.4;
+        scroll-behavior: smooth;
+        overflow-y: auto;
+      }
+
+      .container-resume {
+        font-size: 11pt;
+      }
+
+      /* List styling for proper bullet points and numbered lists */
+      ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+      }
+
+      li {
+        margin: 0.25rem 0;
+        line-height: 1.5;
+      }
+
+      ul ul {
+        list-style-type: circle;
+      }
+
+      ul ul ul {
+        list-style-type: square;
+      }
+
+      .section-title {
+        font-family: 'Lora', serif;
+        font-weight: 700;
+        font-size: 13pt;
+        color: #1f2937;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 4px;
+        margin-bottom: 12px;
+        margin-top: 20px;
+      }
+
+      .section-title:first-child {
+        margin-top: 0;
+      }
+
+      .name-title {
+        font-family: 'Lora', serif;
+        font-weight: 700;
+      }
+
+      .contact-info {
+        color: #374151;
+        font-size: 10pt;
+      }
+
+      .work-item, .education-item, .project-item {
+        margin-bottom: 16px;
+        page-break-inside: avoid;
+      }
+
+      .item-header {
+        margin-bottom: 4px;
+      }
+
+      .item-title {
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .item-subtitle {
+        color: #4b5563;
+        font-style: italic;
+      }
+
+      .item-date {
+        color: #6b7280;
+        font-size: 10pt;
+      }
+
+      .skill-category {
+        margin-bottom: 8px;
+      }
+
+      .skill-category-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .skill-item {
+        display: inline-block;
+        margin-right: 12px;
+        margin-bottom: 4px;
+      }
+
+      .skill-level {
+        color: #6b7280;
+        font-size: 9pt;
+      }
+
+      .interest-item, .reference-item {
+        margin-bottom: 8px;
+      }
+
+      /* Print optimizations */
+      @media print {
+        body {
+          font-size: 10pt;
+        }
+        
+        .container-resume {
+          font-size: 10pt;
+        }
+        
+        .section-title {
+          font-size: 12pt;
+        }
+      }
+
+      /* Link styling */
+      a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* Social links styling */
+      .social-links a {
+        margin-right: 12px;
+        color: #4b5563;
+        font-size: 10pt;
+      }
+
+      .social-links a:last-child {
+        margin-right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-resume max-w-4xl mx-auto p-6 bg-white">
+      
+      <!-- Personal Information Section -->
+      {% if personal_info %}
+      <div class="text-center mb-6">
+        <h1 class="name-title text-2xl mb-2">
+          {{ personal_info.first_name }}{% if personal_info.middle_name %} {{ personal_info.middle_name }}{% endif %} {{ personal_info.last_name }}
+        </h1>
+        {% if personal_info.title %}
+          <div class="text-lg text-gray-600 mb-3">{{ personal_info.title }}</div>
+        {% endif %}
+        
+        <div class="contact-info flex flex-wrap justify-center gap-4 mb-3">
+          {% if personal_info.email %}
+            <span>{{ personal_info.email }}</span>
+          {% endif %}
+          {% if personal_info.phone %}
+            <span>{{ personal_info.phone }}</span>
+          {% endif %}
+          {% if personal_info.address %}
+            <span>{{ personal_info.address }}{% if personal_info.city %}, {{ personal_info.city }}{% endif %}{% if personal_info.state %}, {{ personal_info.state }}{% endif %}</span>
+          {% endif %}
+        </div>
+        
+        <!-- Social Links -->
+        {% if personal_info.website or personal_info.linkedin or personal_info.github or personal_info.x %}
+          <div class="social-links">
+            {% if personal_info.website %}
+              <a href="{{ personal_info.website }}" target="_blank">Website</a>
+            {% endif %}
+            {% if personal_info.linkedin %}
+              <a href="{{ personal_info.linkedin }}" target="_blank">LinkedIn</a>
+            {% endif %}
+            {% if personal_info.github %}
+              <a href="{{ personal_info.github }}" target="_blank">GitHub</a>
+            {% endif %}
+            {% if personal_info.x %}
+              <a href="{{ personal_info.x }}" target="_blank">X (Twitter)</a>
+            {% endif %}
+          </div>
+        {% endif %}
+        
+        <!-- Custom Fields -->
+        {% if personal_info.custom_fields %}
+          <div class="custom-fields mt-2">
+            {% for field in personal_info.custom_fields %}
+              <div class="text-sm text-gray-600">
+                <strong>{{ field.label }}:</strong> {{ field.value }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Summary Section -->
+      {% if visibility.summary and summary %}
+        <div class="mb-6">
+          <h2 class="section-title">Professional Summary</h2>
+          <div class="text-justify">{{ summary|safe }}</div>
+        </div>
+      {% endif %}
+
+      <!-- Work Experience Section -->
+      {% if visibility.workExperience and work_experience %}
+        <div class="mb-6">
+          <h2 class="section-title">Work Experience</h2>
+          {% for job in work_experience %}
+            <div class="work-item">
+              <div class="item-header">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="item-title">{{ job.position }}</div>
+                    <div class="item-subtitle">{{ job.company }}{% if job.location %} - {{ job.location }}{% endif %}</div>
+                  </div>
+                  <div class="item-date text-right">
+                    {{ job.start_date }}{% if not job.current %} - {{ job.end_date }}{% else %} - Present{% endif %}
+                  </div>
+                </div>
+              </div>
+              {% if job.description %}
+                <div class="mt-2">{{ job.description|safe }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Education Section -->
+      {% if visibility.education and education %}
+        <div class="mb-6">
+          <h2 class="section-title">Education</h2>
+          {% for edu in education %}
+            <div class="education-item">
+              <div class="item-header">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="item-title">{{ edu.degree }}{% if edu.field %} in {{ edu.field }}{% endif %}</div>
+                    <div class="item-subtitle">{{ edu.institution }}{% if edu.location %} - {{ edu.location }}{% endif %}</div>
+                  </div>
+                  <div class="item-date text-right">
+                    {{ edu.start_date }}{% if not edu.current %} - {{ edu.end_date }}{% else %} - Present{% endif %}
+                  </div>
+                </div>
+              </div>
+              {% if edu.description %}
+                <div class="mt-2">{{ edu.description|safe }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Projects Section -->
+      {% if visibility.projects and projects %}
+        <div class="mb-6">
+          <h2 class="section-title">Projects</h2>
+          {% for project in projects %}
+            <div class="project-item">
+              <div class="item-header">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="item-title">{{ project.title }}</div>
+                    {% if project.live_url or project.github_url %}
+                      <div class="text-sm mt-1">
+                        {% if project.live_url %}
+                          <a href="{{ project.live_url }}" target="_blank" class="mr-3">Live Demo</a>
+                        {% endif %}
+                        {% if project.github_url %}
+                          <a href="{{ project.github_url }}" target="_blank">GitHub</a>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="item-date text-right">
+                    {{ project.start_date }}{% if not project.current %} - {{ project.end_date }}{% else %} - Present{% endif %}
+                  </div>
+                </div>
+              </div>
+              {% if project.description %}
+                <div class="mt-2">{{ project.description|safe }}</div>
+              {% endif %}
+              {% if project.technologies %}
+                <div class="mt-2">
+                  <strong>Technologies:</strong> 
+                  {% for tech in project.technologies %}
+                    {{ tech }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Skills Section -->
+      {% if visibility.skills and skills %}
+        <div class="mb-6">
+          <h2 class="section-title">Skills</h2>
+          {% regroup skills by category as skill_categories %}
+          {% for category in skill_categories %}
+            <div class="skill-category">
+              <div class="skill-category-title">{{ category.grouper }}</div>
+              <div>
+                {% for skill in category.list %}
+                  <span class="skill-item">
+                    {{ skill.name }}{% if skills_settings.showProficiencyLevels and skill.level %}<span class="skill-level"> ({{ skill.level }}/10)</span>{% endif %}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Interests Section -->
+      {% if visibility.interests and interests %}
+        <div class="mb-6">
+          <h2 class="section-title">Interests</h2>
+          <div>
+            {% for interest in interests %}
+              <span class="interest-item">{{ interest.name }}{% if not forloop.last %}, {% endif %}</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- References Section -->
+      {% if visibility.references and references %}
+        <div class="mb-6">
+          <h2 class="section-title">References</h2>
+          {% for reference in references %}
+            <div class="reference-item">
+              <div class="item-title">{{ reference.name }}</div>
+              <div class="item-subtitle">{{ reference.position }} at {{ reference.company }}</div>
+              <div class="text-sm text-gray-600">
+                {{ reference.email }}{% if reference.phone %} • {{ reference.phone }}{% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    </div>
+  </body>
+</html>

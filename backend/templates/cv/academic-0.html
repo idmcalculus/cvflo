@@ -1,0 +1,464 @@
+{% load cv_filters %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{% if cv_data.personal_info.first_name %}{{ cv_data.personal_info.first_name }}{% if cv_data.personal_info.middle_name %} {{ cv_data.personal_info.middle_name }}{% endif %} {{ cv_data.personal_info.last_name }}{% endif %} - Resume</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			/* Import Inter and Lora fonts for a closer match to typical resume styles */
+			@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@700&display=swap');
+
+			body {
+				font-family: 'Inter', Arial, sans-serif; /* Default sans-serif font */
+				-webkit-print-color-adjust: exact; /* Ensures colors print correctly in WebKit browsers */
+				print-color-adjust: exact; /* Standard property for ensuring colors print */
+				background-color: #f3f4f6; /* bg-gray-100 for the page background */
+				scroll-behavior: smooth;
+				overflow-y: auto;
+			}
+
+			.font-lora {
+				font-family: 'Lora', 'Times New Roman', Times, serif; /* Serif font for the main name */
+			}
+
+			/* List styling for proper bullet points and numbered lists */
+			ul {
+				list-style-type: disc;
+				padding-left: 1.5rem;
+				margin: 0.5rem 0;
+			}
+
+			ol {
+				list-style-type: decimal;
+				padding-left: 1.5rem;
+				margin: 0.5rem 0;
+			}
+
+			li {
+				margin: 0.25rem 0;
+				line-height: 1.5;
+			}
+
+			ul ul {
+				list-style-type: circle;
+			}
+
+			ul ul ul {
+				list-style-type: square;
+			}
+
+			@page {
+				margin: 0.4in 0.5in;
+				size: A4;
+			}
+
+			@page :first {
+				margin-top: 0.4in;
+			}
+
+			@page :left {
+				margin-top: 0.6in;
+			}
+
+			@page :right {
+				margin-top: 0.6in;
+			}
+
+			/* Custom style for section titles to match the PDF's appearance */
+			.section-title {
+				display: inline-block;
+				font-size: 0.8rem; /* Approx 12.8px, aiming for 10-11pt visual feel */
+				font-weight: 700; /* Bold */
+				text-transform: uppercase; /* Uppercase text */
+				letter-spacing: 0.05em; /* Slight letter spacing */
+				color: #1f2937; /* gray-800, dark gray, almost black */
+				padding-bottom: 2px; /* Space for the border */
+				margin-bottom: 0.75rem; /* Equivalent to mb-3 */
+				border-bottom: 1px solid #1f2937; /* Thin border underneath */
+			}
+
+			/* Custom list styling for tighter spacing as seen in many resumes */
+			.custom-list li {
+				margin-bottom: 0.15rem; /* Reduced space between list items */
+			}
+			.custom-list {
+				list-style-position: outside; /* Bullets outside the text block */
+				padding-left: 1.25rem; /* Default Tailwind ml-5 for list-disc */
+			}
+
+			/* Grid layout for employment, projects, and education sections */
+			.content-grid {
+				display: grid;
+				/* Adjust column ratio for date/location vs main content. PDF has dates taking up less space. */
+				grid-template-columns: 0.2fr 0.8fr; /* Approx 1/5 for date, 4/5 for content */
+				gap: 0 1rem; /* No row gap, 1rem column gap */
+			}
+			.content-grid-education {
+				display: grid;
+				grid-template-columns: 0.8fr 0.2fr; /* Main content first, then date */
+				gap: 0 1rem;
+			}
+
+			/* Fine-tune vertical alignment for date columns */
+			.date-col {
+				padding-top: 0.1rem; /* Small top padding to align with title baseline */
+			}
+			.title-col h3 {
+				margin-bottom: 0.2rem; /* Small space below title before bullet points */
+			}
+
+			/* Print-specific styles */
+			@media print {
+				body {
+					background-color: #ffffff; /* White background for printing */
+					font-size: 9.5pt; /* Base font size for print */
+					color: #000000; /* Ensure text is black for print */
+					margin: 0 !important;
+					padding: 0 !important;
+				}
+				.container-resume {
+					max-width: 100% !important;
+					width: 100% !important;
+					padding: 0 !important; /* Remove padding to allow @page margins to control spacing */
+					margin: 0 !important;
+					box-shadow: none !important;
+					border: none !important;
+					min-height: 100vh; /* Ensure full page height utilization */
+				}
+				/* Adjust font sizes for print to match typical resume typography */
+				.print-name { font-size: 22pt !important; }
+				.print-job-title-header { font-size: 13pt !important; }
+				.print-contact-info { font-size: 8.5pt !important; }
+				.section-title { 
+					font-size: 9pt !important; 
+					margin-bottom: 0.4rem !important; 
+					margin-top: 0.5rem !important;
+					border-color: #000000 !important; 
+					color: #000000 !important;
+					page-break-after: avoid !important;
+				}
+				.print-item-title { font-size: 10.5pt !important; color: #000000 !important;}
+				.print-date-text { font-size: 8.5pt !important; color: #333333 !important;}
+				.print-body-text, .custom-list li { font-size: 9pt !important; line-height: 1.35 !important; color: #111111 !important;}
+				.print-tools-skills, .print-links-text { font-size: 8pt !important; line-height: 1.3 !important; color: #222222 !important;}
+				a { color: #0000EE !important; text-decoration: underline !important; } /* Standard print link style */
+
+				/* Enhanced page break control */
+				header { 
+					break-inside: avoid !important;
+					page-break-after: avoid !important;
+				}
+				
+				/* Allow most sections to break naturally */
+				section {
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Small sections should stay together */
+				section:not(.employment-section):not(.projects-section):not(.education-section) {
+					break-inside: avoid;
+					page-break-inside: avoid;
+				}
+				
+				/* Large sections can break naturally */
+				section.employment-section,
+				section.projects-section,
+				section.education-section {
+					break-inside: auto;
+					page-break-inside: auto;
+				}
+				
+				/* Allow employment and project items to break across pages */
+				.employment-section .section-item,
+				.projects-section .section-item {
+					break-inside: auto;
+					page-break-inside: auto;
+					margin-bottom: 0.6rem !important;
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Education items should stay together (they're typically shorter) */
+				.education-section .section-item {
+					break-inside: avoid;
+					page-break-inside: avoid;
+					margin-bottom: 0.6rem !important;
+				}
+				
+				/* Keep section titles with at least some content */
+				.section-title {
+					break-after: avoid;
+					page-break-after: avoid;
+					orphans: 2;
+				}
+				
+				/* Ensure first item after section title stays with title */
+				.section-title + * {
+					page-break-before: avoid !important;
+					break-before: avoid !important;
+				}
+				
+				/* Allow content within items to break naturally */
+				.section-item .content-grid {
+					break-inside: auto;
+					page-break-inside: auto;
+				}
+				
+				/* Allow descriptions and lists to break across pages */
+				.section-item .print-body-text,
+				.section-item ul,
+				.section-item ol,
+				.section-item p {
+					break-inside: auto;
+					page-break-inside: auto;
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Keep list items reasonably together */
+				.section-item li {
+					break-inside: avoid;
+					page-break-inside: avoid;
+					orphans: 2;
+					widows: 2;
+				}
+				
+				/* Keep job title and company with at least one line of description */
+				.title-col h3 {
+					break-after: avoid;
+					page-break-after: avoid;
+					orphans: 2;
+				}
+				
+				/* Optimize spacing between sections */
+				section:not(:first-child) {
+					margin-top: 0.8rem !important;
+				}
+				
+				section:last-child {
+					margin-bottom: 0 !important;
+				}
+			}
+		</style>
+		<script>
+		// Tailwind CSS configuration
+		tailwind.config = {
+			theme: {
+			extend: {
+				fontFamily: {
+				sans: ['Inter', 'Arial', 'sans-serif'],
+				serif: ['Lora', 'Times New Roman', 'Times', 'serif'],
+				},
+				fontSize: {
+					// Define specific font sizes to match resume typography if needed
+					'2xs': '0.6rem', // Extra small for very fine print
+				}
+			}
+			}
+		}
+		</script>
+	</head>
+	<body class="print:bg-white">
+
+		<div class="container-resume w-full bg-white p-4 sm:p-6 md:p-8">
+			<!-- Header -->
+			{% if cv_data.personal_info.first_name %}
+				<header class="text-center mb-6">
+					<h1 class="font-lora text-3xl sm:text-4xl font-bold text-gray-900 print-name">{{ cv_data.personal_info.first_name }}{% if cv_data.personal_info.middle_name %} {{ cv_data.personal_info.middle_name }}{% endif %} {{ cv_data.personal_info.last_name }}</h1>
+					{% if cv_data.personal_info.title %}
+						<p class="text-lg sm:text-xl text-gray-700 print-job-title-header">{{ cv_data.personal_info.title }}</p>
+					{% endif %}
+					<p class="text-xs sm:text-sm text-gray-500 mt-1 print-contact-info">
+						{% if cv_data.personal_info.address %}{{ cv_data.personal_info.address }}{% if cv_data.personal_info.city %}, {{ cv_data.personal_info.city }}{% endif %}{% if cv_data.personal_info.state %}, {{ cv_data.personal_info.state }}{% endif %}{% if cv_data.personal_info.zip_code %} {{ cv_data.personal_info.zip_code }}{% endif %}{% if cv_data.personal_info.country %}, {{ cv_data.personal_info.country }}{% endif %}{% endif %}{% if cv_data.personal_info.phone %}{% if cv_data.personal_info.address %} | {% endif %}{{ cv_data.personal_info.phone }}{% endif %}{% if cv_data.personal_info.email %}{% if cv_data.personal_info.phone %} | {% else %}{% if cv_data.personal_info.address %} | {% endif %}{% endif %}{{ cv_data.personal_info.email }}{% endif %}
+					</p>
+				</header>
+			{% endif %}
+
+			<!-- Links Section -->
+			{% if cv_data.personal_info.linkedin or cv_data.personal_info.website or cv_data.personal_info.github or cv_data.personal_info.x or cv_data.personal_info.instagram or cv_data.personal_info.custom_fields %}
+				<section class="mb-3">
+					<h2 class="section-title">Links</h2>
+					<p class="text-sm text-gray-700 print-links-text">
+						{% if cv_data.personal_info.linkedin %}
+							<a href="{{ cv_data.personal_info.linkedin }}" class="text-blue-600 hover:underline">LinkedIn</a>
+						{% endif %}
+						{% if cv_data.personal_info.website %}
+							{% if cv_data.personal_info.linkedin %}, {% endif %}<a href="{{ cv_data.personal_info.website }}" class="text-blue-600 hover:underline">Website</a>
+						{% endif %}
+						{% if cv_data.personal_info.github %}
+							{% if cv_data.personal_info.linkedin or cv_data.personal_info.website %}, {% endif %}<a href="{{ cv_data.personal_info.github }}" class="text-blue-600 hover:underline">GitHub</a>
+						{% endif %}
+						{% if cv_data.personal_info.x %}
+							{% if cv_data.personal_info.linkedin or cv_data.personal_info.website or cv_data.personal_info.github %}, {% endif %}<a href="{{ cv_data.personal_info.x }}" class="text-blue-600 hover:underline">X (Twitter)</a>
+						{% endif %}
+						{% if cv_data.personal_info.instagram %}
+							{% if cv_data.personal_info.linkedin or cv_data.personal_info.website or cv_data.personal_info.github or cv_data.personal_info.x %}, {% endif %}<a href="{{ cv_data.personal_info.instagram }}" class="text-blue-600 hover:underline">Instagram</a>
+						{% endif %}
+						{% if cv_data.personal_info.custom_fields %}
+							{% for field in cv_data.personal_info.custom_fields %}
+								{% if field.label and field.value %}
+									{% if cv_data.personal_info.linkedin or cv_data.personal_info.website or cv_data.personal_info.github or cv_data.personal_info.x or cv_data.personal_info.instagram %}
+										, {% if field.value|is_url %}
+											<a href="{{ field.value }}" class="text-blue-600 hover:underline">{{ field.label }}</a>
+										{% else %}
+											<span class="text-blue-600">{{ field.label }}: {{ field.value }}</span>
+										{% endif %}
+									{% else %}
+										{% if not forloop.first %}, {% endif %}{% if field.value|is_url %}
+											<a href="{{ field.value }}" class="text-blue-600 hover:underline">{{ field.label }}</a>
+										{% else %}
+											<span class="text-blue-600">{{ field.label }}: {{ field.value }}</span>
+										{% endif %}
+									{% endif %}
+								{% endif %}
+							{% endfor %}
+						{% endif %}
+					</p>
+				</section>
+			{% endif %}
+
+			<!-- Profile/Summary -->
+			{% if visibility.summary and cv_data.summary %}
+				<section class="mb-3">
+					<h2 class="section-title">Profile</h2>
+					<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{ cv_data.summary|safe }}</div>
+				</section>
+			{% endif %}
+
+			<!-- Employment History -->
+			{% if visibility.work_experience and cv_data.work_experiences %}
+				<section class="mb-4 employment-section">
+					<h2 class="section-title">Employment History</h2>
+
+					{% for work in cv_data.work_experiences %}
+						<div class="mb-2 section-item">
+							<div class="content-grid">
+								<div class="text-xs font-medium text-gray-500 date-col print-date-text">{{ work.start_date|date:"M Y" }} - {% if work.current %}Present{% else %}{{ work.end_date|date:"M Y" }}{% endif %}</div>
+								<div class="title-col">
+									<h3 class="text-base font-semibold text-gray-800 print-item-title">{{ work.position }}, {{ work.company }}{% if work.location %} <span class="text-xs font-normal text-gray-500 align-middle ml-1">{{ work.location }}</span>{% endif %}</h3>
+								</div>
+							</div>
+							{% if work.description %}
+								<div class="content-grid">
+									<div></div>
+									<div>
+										<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{ work.description|safe }}</div>
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					{% endfor %}
+				</section>
+			{% endif %}
+
+			<!-- Personal Projects -->
+			{% if visibility.projects and cv_data.projects %}
+				<section class="mb-4 projects-section">
+					<h2 class="section-title">Personal Projects</h2>
+
+					{% for project in cv_data.projects %}
+						<div class="mb-2 section-item">
+							<div class="content-grid">
+								<div class="text-xs font-medium text-gray-500 date-col print-date-text">{{ project.start_date|date:"M Y" }}{% if not project.current %} - {{ project.end_date|date:"M Y" }}{% endif %}</div>
+								<div class="title-col">
+									<h3 class="text-base font-semibold text-gray-800 print-item-title">{{ project.title }}</h3>
+								</div>
+							</div>
+							<div class="content-grid">
+								<div></div>
+								<div>
+									{% if project.description %}
+										<div class="text-sm text-gray-700 mb-1 leading-relaxed print-body-text">{{ project.description|safe }}</div>
+									{% endif %}
+									{% if project.live_url %}
+										<p class="text-sm text-gray-700 mb-1 leading-relaxed print-links-text">
+											<strong class="font-semibold">Links:</strong> 
+											<a href="{{ project.live_url }}" class="text-blue-600 hover:underline">App</a>{% if project.github_url %} | <a href="{{ project.github_url }}" class="text-blue-600 hover:underline">GitHub</a>{% endif %}
+										</p>
+									{% elif project.github_url %}
+										<p class="text-sm text-gray-700 mb-1 leading-relaxed print-links-text">
+											<strong class="font-semibold">Links:</strong> 
+											<a href="{{ project.github_url }}" class="text-blue-600 hover:underline">GitHub</a>
+										</p>
+									{% endif %}
+									{% if project.technologies %}
+										<p class="text-xs mt-1 text-gray-600 leading-relaxed print-tools-skills">
+											<strong class="font-semibold">Tools/Skills:</strong> {{ project.technologies|join:", " }}
+										</p>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+				</section>
+			{% endif %}
+
+			<!-- Education and Certifications -->
+			{% if visibility.education and cv_data.educations %}
+				<section class="education-section">
+					<h2 class="section-title">Education and Certifications</h2>
+					
+					{% for education in cv_data.educations %}
+						<div class="content-grid-education mb-1 section-item">
+							<p class="text-sm text-gray-800 print-body-text">{{ education.degree }}{% if education.field %} in {{ education.field }}{% endif %}, {{ education.institution }}{% if education.location %} ({{ education.location }}){% endif %}</p>
+							<p class="text-xs text-gray-500 text-right print-date-text pt-px">{{ education.start_date|date:"M Y" }}{% if not education.current %} - {{ education.end_date|date:"M Y" }}{% endif %}</p>
+						</div>
+						{% if education.description %}
+							<div class="content-grid-education mb-1.5">
+								<div class="text-sm text-gray-700 leading-relaxed print-body-text">{{ education.description|safe }}</div>
+								<div></div>
+							</div>
+						{% endif %}
+					{% endfor %}
+				</section>
+			{% endif %}
+
+			<!-- Skills -->
+			{% if visibility.skills and cv_data.skills %}
+				<section class="mb-3">
+					<h2 class="section-title">Technical Skills</h2>
+					{% regroup cv_data.skills by category as skill_groups %}
+					{% for group in skill_groups %}
+						<div class="mb-2">
+							<div class="text-sm text-gray-700 print-body-text">
+								<strong>{{ group.grouper }}:</strong>
+								{% for skill in group.list %}{{ skill.name }}{% if cv_data.section_settings.skills.show_proficiency_levels and skill.level %} ({{ skill.level }}/5){% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
+							</div>
+						</div>
+					{% endfor %}
+				</section>
+			{% endif %}
+
+			<!-- Interests -->
+			{% if visibility.interests and cv_data.interests %}
+				<section class="mb-3">
+					<h2 class="section-title">Interests</h2>
+					<div class="text-sm text-gray-700 print-body-text">
+						{% for interest in cv_data.interests %}{{ interest.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+					</div>
+				</section>
+			{% endif %}
+
+			<!-- References -->
+			{% if visibility.references and cv_data.references %}
+				<section class="references-section">
+					<h2 class="section-title">References</h2>
+					{% for reference in cv_data.references %}
+						<div class="content-grid-education mb-1 section-item">
+							<div>
+								<p class="text-sm text-gray-800 print-body-text font-semibold">{{ reference.name }}</p>
+								<p class="text-sm text-gray-700 print-body-text">{{ reference.position }}{% if reference.company %} at {{ reference.company }}{% endif %}</p>
+								{% if reference.email %}<p class="text-xs text-gray-600 print-tools-skills">{{ reference.email }}</p>{% endif %}
+								{% if reference.phone %}<p class="text-xs text-gray-600 print-tools-skills">{{ reference.phone }}</p>{% endif %}
+							</div>
+							<div></div>
+						</div>
+					{% endfor %}
+				</section>
+			{% endif %}
+		</div>
+	</body>
+</html>

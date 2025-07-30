@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to CVFlo!</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 40px 30px 30px;
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .header p {
+            margin: 8px 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #1F2937;
+            font-size: 24px;
+            margin: 0 0 20px;
+            font-weight: 600;
+        }
+        .content p {
+            margin: 0 0 20px;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-1px);
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .feature-grid {
+            display: table;
+            width: 100%;
+            margin: 30px 0;
+        }
+        .feature-item {
+            display: table-cell;
+            width: 50%;
+            padding: 20px;
+            vertical-align: top;
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 8px;
+        }
+        .feature-description {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.5;
+        }
+        .tips-section {
+            background: #F0F9FF;
+            border: 1px solid #E0F2FE;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 30px 0;
+        }
+        .tips-section h3 {
+            color: #0C4A6E;
+            font-size: 18px;
+            margin: 0 0 16px;
+            font-weight: 600;
+        }
+        .tips-section ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #0F172A;
+        }
+        .tips-section li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding: 30px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .footer p {
+            font-size: 14px;
+            color: #6B7280;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        .footer a {
+            color: #3B82F6;
+            text-decoration: none;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #E5E7EB, transparent);
+            margin: 30px 0;
+        }
+        @media (max-width: 600px) {
+            .feature-grid {
+                display: block;
+            }
+            .feature-item {
+                display: block;
+                width: 100%;
+                padding: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CVFlo</h1>
+            <p>Professional CV Builder by JaydeeTech Ltd</p>
+        </div>
+        
+        <div class="content">
+            <h2>Welcome to CVFlo! 🎉</h2>
+            
+            <p>Congratulations! Your account has been successfully verified and you're now ready to create professional CVs that make a lasting impression.</p>
+            
+            <p>CVFlo is designed to help you build standout CVs quickly and professionally, whether you're applying for your first job or making a career change.</p>
+            
+            <div class="button-container">
+                <a href="{{ .SiteURL }}" class="button">Start Building Your CV</a>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <div class="feature-title">Multiple Templates</div>
+                    <div class="feature-description">Choose from professionally designed templates that work for any industry</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👁️</div>
+                    <div class="feature-title">Real-time Preview</div>
+                    <div class="feature-description">See your CV update instantly as you add information and make changes</div>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">⬇️</div>
+                    <div class="feature-title">PDF Download</div>
+                    <div class="feature-description">Export high-quality PDFs ready for applications and interviews</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💼</div>
+                    <div class="feature-title">Multiple Versions</div>
+                    <div class="feature-description">Create and manage different CV versions for different opportunities</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="tips-section">
+                <h3>💡 Pro Tips for Getting Started</h3>
+                <ul>
+                    <li><strong>Start with Personal Info:</strong> Add your contact details and professional summary first</li>
+                    <li><strong>Highlight Key Experience:</strong> Focus on achievements and quantifiable results</li>
+                    <li><strong>Choose the Right Template:</strong> Match your template to your industry and experience level</li>
+                    <li><strong>Keep it Concise:</strong> Aim for 1-2 pages depending on your experience</li>
+                    <li><strong>Proofread Everything:</strong> Double-check for typos and formatting consistency</li>
+                </ul>
+            </div>
+            
+            <p>Need help getting started? Our intuitive interface makes it easy, but don't hesitate to reach out if you have any questions.</p>
+            
+            <p><strong>Ready to make your mark?</strong> Your next opportunity is just a great CV away!</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>CVFlo Team</strong></p>
+            <p>This email was sent by CVFlo, a product of JaydeeTech Ltd.</p>
+            <p>Need help? Contact us at <a href="mailto:support@jaydeetechltd.com">support@jaydeetechltd.com</a></p>
+            <p style="margin-top: 20px;">
+                Follow us for tips and updates: 
+                <a href="#" style="margin: 0 8px;">LinkedIn</a> | 
+                <a href="#" style="margin: 0 8px;">Twitter</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

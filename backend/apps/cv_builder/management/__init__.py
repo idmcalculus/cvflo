@@ -1,0 +1,1 @@
+# Management commands for CV Builder app

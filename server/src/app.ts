@@ -82,14 +82,16 @@ export const createApp = async (): Promise<Express> => {
   const { PdfService } = await import('./services/pdfService.ts');
   const { PdfController } = await import('./controllers/pdfController.ts');
   const createPdfRouter = (await import('./routes/pdfRoutes.ts')).default;
+  const { cvRoutes } = await import('./routes/cvRoutes.ts');
 
   // Create instances of services and controllers
   const pdfService = new PdfService();
   const pdfController = new PdfController(pdfService);
 
-  // Create and use the router
+  // Create and use the routers
   const pdfRoutes = createPdfRouter(pdfController);
   app.use('/api', pdfRoutes);
+  app.use('/api/cv', cvRoutes);
   
   // Serve static files from the 'public' directory
   const publicPath = path.join(__dirname, '../public');
@@ -119,7 +121,7 @@ export const createApp = async (): Promise<Express> => {
   });
   
   // Global error handler - must be applied after all routes
-  app.use(errorHandler);
+  app.use(errorHandler as any);
   
   return app;
 };

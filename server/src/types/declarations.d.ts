@@ -1,4 +1,6 @@
 // Type declarations for modules without TypeScript definitions
+import { AuthUser } from '../services/supabaseService';
+
 declare module 'express' {
   import { IncomingMessage, ServerResponse } from 'http';
   
@@ -9,6 +11,7 @@ declare module 'express' {
     ip: string;
     path: string;
     method: string;
+    user?: AuthUser;
   }
   
   export interface Response extends ServerResponse {
@@ -24,6 +27,7 @@ declare module 'express' {
   }
   
   export interface Express {
+    use(handler: (err: any, req: Request, res: Response, next: NextFunction) => void): Express;
     use(...handlers: any[]): Express;
     get(path: string, ...handlers: any[]): Express;
     post(path: string, ...handlers: any[]): Express;
@@ -69,7 +73,12 @@ declare module 'cors' {
 declare module 'helmet' {
   import { Request, Response, NextFunction } from 'express';
   
-  function helmet(): (req: Request, res: Response, next: NextFunction) => void;
+  interface HelmetOptions {
+    contentSecurityPolicy?: boolean | object;
+    [key: string]: any;
+  }
+  
+  function helmet(options?: HelmetOptions): (req: Request, res: Response, next: NextFunction) => void;
   export default helmet;
 }
 

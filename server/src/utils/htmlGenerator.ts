@@ -1,21 +1,21 @@
 import { CVData, SectionVisibility } from '../types/cv.ts';
-import { TemplateService } from '../services/templateService.ts';
+import { HandlebarsTemplateService } from '../services/handlebarsTemplateService.ts';
 
 /**
  * HTML Generator utility class
- * Handles generation of HTML templates for PDF using the template system
+ * Handles generation of HTML templates for PDF using Handlebars
  */
 export class HtmlGenerator {
-  private templateService: TemplateService;
+  private templateService: HandlebarsTemplateService;
 
   constructor() {
-    this.templateService = new TemplateService();
+    this.templateService = new HandlebarsTemplateService();
   }
 
   /**
    * Generate HTML content based on CV data and template
    */
-  public async generateHTML(data: CVData, visibility: SectionVisibility, templateName = 'classic'): Promise<string> {
+  public async generateHTML(data: CVData, visibility: SectionVisibility, templateName = 'classic-0'): Promise<string> {
     try {
       return await this.templateService.renderCV(templateName, data, visibility);
     } catch (error) {

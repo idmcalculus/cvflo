@@ -1,0 +1,42 @@
+{
+  "name": "cvflo-django-backend",
+  "version": "1.0.0",
+  "description": "CVFlo Django Backend - Equivalent scripts to Node.js server package.json",
+  "scripts": {
+    "comment": "Django equivalent scripts (run with: python manage.py <command>)",
+    "start": "python manage.py runserver 0.0.0.0:8000",
+    "dev": "python manage.py runserver 127.0.0.1:8000",
+    "build": "python manage.py collectstatic --noinput",
+    "test": "python manage.py test",
+    "build_client": "python manage.py build_client",
+    "build_client_clean": "python manage.py build_client --clean",
+    "dev_full": "python manage.py dev_full",
+    "start_full": "python manage.py start_full",
+    "start_full_gunicorn": "python manage.py start_full --gunicorn"
+  },
+  "django_commands": {
+    "migration_commands": {
+      "makemigrations": "python manage.py makemigrations",
+      "migrate": "python manage.py migrate",
+      "reset_db": "rm db.sqlite3 && python manage.py migrate"
+    },
+    "admin_commands": {
+      "createsuperuser": "python manage.py createsuperuser",
+      "shell": "python manage.py shell",
+      "dbshell": "python manage.py dbshell"
+    },
+    "development_commands": {
+      "dev_full": "python manage.py dev_full --port 8000",
+      "start_full": "python manage.py start_full --port 8000",
+      "build_client": "python manage.py build_client --clean"
+    }
+  },
+  "equivalent_to_nodejs": {
+    "Node.js 'bun run dev'": "python manage.py dev",
+    "Node.js 'bun run start'": "python manage.py start",
+    "Node.js 'bun run build:client'": "python manage.py build_client",
+    "Node.js 'bun run setup:public'": "Handled automatically in build_client",
+    "Node.js 'bun run dev:full'": "python manage.py dev_full",
+    "Node.js 'bun run start:full'": "python manage.py start_full"
+  }
+}

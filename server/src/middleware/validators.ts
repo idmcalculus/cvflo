@@ -20,6 +20,19 @@ export const validatePdfRequest = [
     .withMessage('Visibility settings cannot be empty')
     .isObject()
     .withMessage('Visibility must be an object'),
+
+  check('cvData.skills.*.name')
+    .notEmpty()
+    .withMessage('Skill name is required'),
+
+  check('cvData.skills.*.category')
+    .notEmpty()
+    .withMessage('Skill category is required'),
+
+  check('cvData.skills.*.level')
+    .optional({ checkFalsy: true })
+    .isInt({ min: 1, max: 5 })
+    .withMessage('Skill level must be a number between 1 and 5'),
   
   // Add validation errors to the request
   (req: Request, res: Response, next: NextFunction): void => {

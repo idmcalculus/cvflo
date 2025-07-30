@@ -52,10 +52,10 @@ describe('HtmlGenerator', () => {
         }
       ],
       skills: [
-        { id: '1', name: 'JavaScript', level: 5 },
-        { id: '2', name: 'TypeScript', level: 4 },
-        { id: '3', name: 'React', level: 4 },
-        { id: '4', name: 'Node.js', level: 4 }
+        { id: '1', name: 'JavaScript', level: 5, category: 'Programming Languages' },
+        { id: '2', name: 'TypeScript', level: 4, category: 'Programming Languages' },
+        { id: '3', name: 'React', level: 4, category: 'Frameworks' },
+        { id: '4', name: 'Node.js', level: 4, category: 'Runtime' }
       ],
       projects: [
         {

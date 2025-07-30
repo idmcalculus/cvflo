@@ -100,7 +100,7 @@ bun run dev
 
 5. **Open your browser:**
    - Application: `http://localhost:3000`
-   - API: `http://localhost:5001`
+   - API: `http://127.0.0.1:8000`
 
 ## 📦 Available Scripts
 

@@ -1,5 +1,12 @@
+export interface CustomField {
+  id: string;
+  label: string;
+  value: string;
+}
+
 export interface PersonalInfo {
   firstName: string;
+  middleName?: string;
   lastName: string;
   email: string;
   phone: string;
@@ -11,6 +18,14 @@ export interface PersonalInfo {
   title: string;
   website?: string;
   linkedin?: string;
+  github?: string;
+  x?: string; // Renamed from twitter
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  medium?: string;
+  stackoverflow?: string;
+  customFields?: CustomField[];
 }
 
 export interface WorkExperience {
@@ -51,7 +66,8 @@ export interface Project {
 export interface Skill {
   id: string;
   name: string;
-  level: number; // 1-5
+  level?: number;
+  category: string;
 }
 
 export interface Interest {
@@ -68,6 +84,14 @@ export interface Reference {
   phone: string;
 }
 
+export interface SkillsSettings {
+  showProficiencyLevels: boolean;
+}
+
+export interface SectionSettings {
+  skills: SkillsSettings;
+}
+
 export interface CVData {
   personalInfo: PersonalInfo;
   summary: string;
@@ -77,6 +101,7 @@ export interface CVData {
   skills: Skill[];
   interests: Interest[];
   references: Reference[];
+  sectionSettings?: SectionSettings;
 }
 
 export interface SectionVisibility {

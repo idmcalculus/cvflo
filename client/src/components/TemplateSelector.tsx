@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Palette, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Palette, Check, Star, RotateCcw } from 'lucide-react';
 import { useCVStore } from '../store/cvStore';
 
 interface Template {
@@ -11,14 +11,8 @@ interface Template {
 
 const availableTemplates: Template[] = [
   {
-    id: 'default',
-    name: 'Default Preview',
-    description: 'Use the current preview layout as shown in the preview panel',
-    preview: '📄 Current Preview Layout'
-  },
-  {
     id: 'classic-0',
-    name: 'Classic 0',
+    name: 'Classic Professional',
     description: 'Professional design with blue accents and clean layout',
     preview: '🏛️ Traditional & Professional'
   },
@@ -43,13 +37,24 @@ const availableTemplates: Template[] = [
 ];
 
 const TemplateSelector: React.FC = () => {
-  const { selectedTemplate, setSelectedTemplate } = useCVStore();
+  const { selectedTemplate, defaultTemplate, setSelectedTemplate, setDefaultTemplate, resetToDefaultTemplate } = useCVStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const currentTemplate = availableTemplates.find(t => t.id === selectedTemplate) || availableTemplates[0];
+  const defaultTemplateData = availableTemplates.find(t => t.id === defaultTemplate) || availableTemplates[0];
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
+    setIsOpen(false);
+  };
+
+  const handleSetAsDefault = (templateId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDefaultTemplate(templateId);
+  };
+
+  const handleUseDefault = () => {
+    resetToDefaultTemplate();
     setIsOpen(false);
   };
 
@@ -61,15 +66,25 @@ const TemplateSelector: React.FC = () => {
         type="button"
       >
         <Palette className="w-4 h-4 text-gray-600" />
-        <span className="text-sm font-medium text-gray-700">Template: {currentTemplate.name}</span>
-        <svg 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">{currentTemplate.name}</span>
+          {selectedTemplate === defaultTemplate && (
+            <Star className="w-3 h-3 text-amber-500 fill-current" title="Using default template" />
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          {selectedTemplate !== defaultTemplate && (
+            <span className="text-xs text-gray-500">Default: {defaultTemplateData.name}</span>
+          )}
+          <svg 
+            className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </button>
 
       {isOpen && (
@@ -83,7 +98,19 @@ const TemplateSelector: React.FC = () => {
           {/* Dropdown */}
           <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
             <div className="p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Choose Template</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-900">Choose Template</h3>
+                {selectedTemplate !== defaultTemplate && (
+                  <button
+                    onClick={handleUseDefault}
+                    className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+                    title="Use default template"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    Use Default
+                  </button>
+                )}
+              </div>
               <div className="space-y-2">
                 {availableTemplates.map((template) => (
                   <button
@@ -100,12 +127,29 @@ const TemplateSelector: React.FC = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium text-gray-900">{template.name}</span>
-                          {selectedTemplate === template.id && (
-                            <Check className="w-4 h-4 text-blue-600" />
-                          )}
+                          <div className="flex items-center gap-1">
+                            {defaultTemplate === template.id && (
+                              <Star className="w-4 h-4 text-amber-500 fill-current" title="Default template" />
+                            )}
+                            {selectedTemplate === template.id && (
+                              <Check className="w-4 h-4 text-blue-600" title="Currently selected" />
+                            )}
+                          </div>
                         </div>
                         <p className="text-xs text-gray-600 mb-2">{template.description}</p>
-                        <div className="text-xs text-gray-500">{template.preview}</div>
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-gray-500">{template.preview}</div>
+                          {defaultTemplate !== template.id && (
+                            <button
+                              onClick={(e) => handleSetAsDefault(template.id, e)}
+                              className="text-xs text-gray-400 hover:text-amber-500 transition-colors flex items-center gap-1"
+                              title="Set as default template"
+                            >
+                              <Star className="w-3 h-3" />
+                              Set Default
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </button>

@@ -6,7 +6,7 @@ import type { Server } from 'http';
 import type { CVData, SectionVisibility } from '../../src/types/cv.ts';
 
 // Mock dependencies
-const mockGeneratePdf = mock<(cvData: CVData, visibility: SectionVisibility) => Promise<Buffer>>();
+const mockGeneratePdf = mock<(cvData: CVData, visibility: SectionVisibility, templateName?: string) => Promise<Buffer>>();
 const mockGetSuggestedFilename = mock<(data: CVData) => string>();
 
 // Mock the entire security middleware module to avoid app.use() errors in tests
@@ -149,7 +149,7 @@ describe('PDF Generation Endpoint Integration Tests', () => {
 
     expect(response.headers['content-disposition']).toContain('attachment; filename="John_Doe_CV.pdf"');
     expect(response.body).toBeInstanceOf(Buffer);
-    expect(mockGeneratePdf).toHaveBeenCalledWith(validCVData, validVisibility);
+    expect(mockGeneratePdf).toHaveBeenCalledWith(validCVData, validVisibility, 'classic-0');
   });
 
   it('should use the suggested filename when provided', async () => {

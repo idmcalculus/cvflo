@@ -2,7 +2,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { Express } from 'express';
 import rateLimit from 'express-rate-limit';
-import config from '../config';
+import config from '../config/index.ts';
 
 /**
  * Apply security middleware to Express application

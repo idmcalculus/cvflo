@@ -3,21 +3,24 @@ import { useCVStore } from '../../store/cvStore';
 import { 
   User, FileText, Briefcase, GraduationCap, 
   Star, Heart, BookUser, FolderGit2, Check, X,
-  LucideIcon, ChevronLeft, ChevronRight, Menu,
-  Maximize2, Minimize2, Settings
+  LucideIcon, ChevronLeft, ChevronRight,
+  Maximize2, Minimize2
 } from 'lucide-react';
 import DownloadPdfButton from '../PDF/DownloadPdfButton';
 import ProgressIndicator from './ProgressIndicator';
+import ProfileIcon from '../Profile/ProfileIcon';
 import { SectionVisibility } from '../../types/cv.types';
 
 interface SectionItem {
   id: string;
   label: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  customIcon?: boolean;
   toggleable?: boolean;
 }
 
 const sections: SectionItem[] = [
+  { id: 'profile', label: 'Profile', customIcon: true },
   { id: 'personalInfo', label: 'Personal Info', icon: User },
   { id: 'summary', label: 'Summary', icon: FileText, toggleable: true },
   { id: 'workExperience', label: 'Work Experience', icon: Briefcase, toggleable: true },
@@ -36,7 +39,6 @@ const Sidebar: React.FC = (): React.ReactElement => {
     toggleSectionVisibility,
     ui,
     toggleSidebar,
-    toggleSidebarCompactMode,
     toggleFullscreen
   } = useCVStore();
 
@@ -90,9 +92,12 @@ const Sidebar: React.FC = (): React.ReactElement => {
         <div className="flex items-center justify-between mb-6">
           {!ui.sidebarCollapsed && (
             <div className="flex items-center justify-between w-full">
-              <h2 className="text-xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                CVFlo
-              </h2>
+              <div>
+                <h2 className="text-xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  CVFlo
+                </h2>
+                <p className="text-xs text-gray-500 font-medium">by Jaydeetech</p>
+              </div>
               {/* Mobile Toggle Button */}
               <button
                 className="lg:hidden p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
@@ -104,18 +109,8 @@ const Sidebar: React.FC = (): React.ReactElement => {
               </button>
             </div>
           )}
-          
-          {ui.sidebarCollapsed && (
-            <button
-              className="w-full flex justify-center p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
-              onClick={toggleSidebar}
-              title="Expand menu"
-              type="button"
-            >
-              <Menu className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
-            </button>
-          )}
         </div>
+
 
         {/* Progress Indicator */}
         {!ui.sidebarCollapsed && (
@@ -132,13 +127,6 @@ const Sidebar: React.FC = (): React.ReactElement => {
             >
               {ui.isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
               <span>Preview</span>
-            </button>
-            <button
-              className="p-2 text-xs bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200"
-              onClick={toggleSidebarCompactMode}
-              title="Toggle compact mode"
-            >
-              <Settings className="w-3 h-3" />
             </button>
           </div>
         )}
@@ -169,12 +157,20 @@ const Sidebar: React.FC = (): React.ReactElement => {
                     <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-600 to-purple-600 rounded-r-full" />
                   )}
                   
-                  <section.icon 
-                    className={`w-5 h-5 transition-all duration-200 ${
+                  {section.customIcon ? (
+                    <div className={`transition-all duration-200 ${
                       ui.sidebarCollapsed ? 'mx-auto' : 'mr-3'
-                    } ${activeSection === section.id ? 'text-blue-600' : ''}`} 
-                    aria-hidden="true" 
-                  />
+                    }`}>
+                      <ProfileIcon />
+                    </div>
+                  ) : section.icon ? (
+                    <section.icon 
+                      className={`w-5 h-5 transition-all duration-200 ${
+                        ui.sidebarCollapsed ? 'mx-auto' : 'mr-3'
+                      } ${activeSection === section.id ? 'text-blue-600' : ''}`} 
+                      aria-hidden="true" 
+                    />
+                  ) : null}
                   
                   {!ui.sidebarCollapsed && (
                     <span className="font-medium text-sm">{section.label}</span>

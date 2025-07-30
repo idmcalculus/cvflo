@@ -22,7 +22,7 @@ const config = {
   nodeEnv: getString(process.env.NODE_ENV, 'development'),
   clientUrl: getString(process.env.CLIENT_URL, 'http://localhost:3000'),
   rateLimitWindow: getNumber(process.env.RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000), // 15 minutes
-  rateLimitMax: getNumber(process.env.RATE_LIMIT_MAX, 100), // limit each IP to 100 requests per window
+  rateLimitMax: getNumber(process.env.RATE_LIMIT_MAX, 300), // limit each IP to 300 requests per window
 };
 
 export default config;

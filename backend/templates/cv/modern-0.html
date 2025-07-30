@@ -1,0 +1,497 @@
+{% load static %}
+{% load cv_filters %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if personal_info.first_name %}{{ personal_info.first_name }}{% if personal_info.middle_name %} {{ personal_info.middle_name }}{% endif %} {{ personal_info.last_name }}{% else %}CV{% endif %} - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+      body {
+        font-family: 'Inter', Arial, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        line-height: 1.5;
+        color: #1f2937;
+        scroll-behavior: smooth;
+        overflow-y: auto;
+      }
+
+      .container-resume {
+        font-size: 11pt;
+      }
+
+      /* Modern two-column layout */
+      .cv-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+      }
+
+      .left-column {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        min-height: 100vh;
+      }
+
+      .right-column {
+        padding: 2rem;
+      }
+
+      .name-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 28pt;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+      }
+
+      .job-title {
+        font-size: 14pt;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+      }
+
+      /* Left column sections */
+      .left-section {
+        margin-bottom: 2rem;
+      }
+
+      .left-section-title {
+        font-size: 12pt;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .contact-item {
+        margin-bottom: 0.75rem;
+        font-size: 10pt;
+        display: flex;
+        align-items: center;
+      }
+
+      .contact-item svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+        opacity: 0.8;
+      }
+
+      .skill-item {
+        margin-bottom: 0.75rem;
+      }
+
+      .skill-name {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      .skill-level-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .skill-level-fill {
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+      }
+
+      /* Right column sections */
+      .right-section {
+        margin-bottom: 2rem;
+      }
+
+      .right-section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 14pt;
+        font-weight: 700;
+        color: #4f46e5;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-left: 1rem;
+      }
+
+      .right-section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+      }
+
+      .work-item, .education-item, .project-item {
+        margin-bottom: 1.5rem;
+        padding-left: 1rem;
+        border-left: 2px solid #e5e7eb;
+        position: relative;
+      }
+
+      .work-item::before, .education-item::before, .project-item::before {
+        content: '';
+        position: absolute;
+        left: -6px;
+        top: 0.25rem;
+        width: 10px;
+        height: 10px;
+        background: #4f46e5;
+        border-radius: 50%;
+      }
+
+      .item-header {
+        margin-bottom: 0.5rem;
+      }
+
+      .item-title {
+        font-weight: 600;
+        font-size: 12pt;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+      }
+
+      .item-subtitle {
+        color: #4f46e5;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      .item-meta {
+        color: #6b7280;
+        font-size: 10pt;
+        margin-bottom: 0.5rem;
+      }
+
+      .item-description {
+        color: #4b5563;
+        line-height: 1.6;
+      }
+
+      /* Lists */
+      ul, ol {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+      }
+
+      li {
+        margin: 0.25rem 0;
+        line-height: 1.6;
+      }
+
+      /* Links */
+      a {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+      }
+
+      .right-column a {
+        color: #4f46e5;
+      }
+
+      a:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+      }
+
+      /* Technologies tags */
+      .tech-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .tech-tag {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 9pt;
+        font-weight: 500;
+      }
+
+      /* Interests */
+      .interests-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .interest-tag {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 9pt;
+        font-weight: 500;
+      }
+
+      /* Print optimizations */
+      @media print {
+        body {
+          font-size: 10pt;
+        }
+        
+        .container-resume {
+          font-size: 10pt;
+        }
+        
+        .name-title {
+          font-size: 24pt;
+        }
+        
+        .left-column {
+          min-height: auto;
+        }
+      }
+
+      /* Mobile responsiveness */
+      @media (max-width: 768px) {
+        .cv-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .left-column {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-resume bg-white">
+      <div class="cv-grid">
+        
+        <!-- Left Column -->
+        <div class="left-column">
+          <!-- Personal Info -->
+          {% if personal_info %}
+            <div class="text-center mb-8">
+              <h1 class="name-title">
+                {{ personal_info.first_name }}{% if personal_info.middle_name %} {{ personal_info.middle_name }}{% endif %} {{ personal_info.last_name }}
+              </h1>
+              {% if personal_info.title %}
+                <div class="job-title">{{ personal_info.title }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Contact Information -->
+            <div class="left-section">
+              <h3 class="left-section-title">Contact</h3>
+              {% if personal_info.email %}
+                <div class="contact-item">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                  </svg>
+                  {{ personal_info.email }}
+                </div>
+              {% endif %}
+              {% if personal_info.phone %}
+                <div class="contact-item">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                  </svg>
+                  {{ personal_info.phone }}
+                </div>
+              {% endif %}
+              {% if personal_info.address %}
+                <div class="contact-item">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                  </svg>
+                  {{ personal_info.address }}{% if personal_info.city %}, {{ personal_info.city }}{% endif %}{% if personal_info.state %}, {{ personal_info.state }}{% endif %}
+                </div>
+              {% endif %}
+              {% if personal_info.website %}
+                <div class="contact-item">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.559-.499-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.559.499.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.497-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.032 11H4.083a6.004 6.004 0 002.851 4.118z" clip-rule="evenodd"></path>
+                  </svg>
+                  <a href="{{ personal_info.website }}" target="_blank">Website</a>
+                </div>
+              {% endif %}
+              {% if personal_info.linkedin %}
+                <div class="contact-item">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clip-rule="evenodd"></path>
+                  </svg>
+                  <a href="{{ personal_info.linkedin }}" target="_blank">LinkedIn</a>
+                </div>
+              {% endif %}
+              {% if personal_info.github %}
+                <div class="contact-item">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <a href="{{ personal_info.github }}" target="_blank">GitHub</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <!-- Skills -->
+          {% if visibility.skills and skills %}
+            <div class="left-section">
+              <h3 class="left-section-title">Skills</h3>
+              {% regroup skills by category as skill_categories %}
+              {% for category in skill_categories %}
+                <div class="mb-4">
+                  <div class="skill-category-title text-sm font-semibold mb-2 opacity-90">{{ category.grouper }}</div>
+                  {% for skill in category.list %}
+                    <div class="skill-item">
+                      <div class="skill-name">{{ skill.name }}</div>
+                      {% if skills_settings.showProficiencyLevels and skill.level %}
+                        <div class="skill-level-bar">
+                          <div class="skill-level-fill" style="width: {{ skill.level }}0%"></div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Interests -->
+          {% if visibility.interests and interests %}
+            <div class="left-section">
+              <h3 class="left-section-title">Interests</h3>
+              <div class="interests-grid">
+                {% for interest in interests %}
+                  <span class="interest-tag">{{ interest.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-column">
+          
+          <!-- Summary -->
+          {% if visibility.summary and summary %}
+            <div class="right-section">
+              <h2 class="right-section-title">Professional Summary</h2>
+              <div class="text-justify">{{ summary|safe }}</div>
+            </div>
+          {% endif %}
+
+          <!-- Work Experience -->
+          {% if visibility.workExperience and work_experience %}
+            <div class="right-section">
+              <h2 class="right-section-title">Work Experience</h2>
+              {% for job in work_experience %}
+                <div class="work-item">
+                  <div class="item-header">
+                    <div class="item-title">{{ job.position }}</div>
+                    <div class="item-subtitle">{{ job.company }}</div>
+                    <div class="item-meta">
+                      {% if job.location %}{{ job.location }} • {% endif %}
+                      {{ job.start_date }}{% if not job.current %} - {{ job.end_date }}{% else %} - Present{% endif %}
+                    </div>
+                  </div>
+                  {% if job.description %}
+                    <div class="item-description">{{ job.description|safe }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Education -->
+          {% if visibility.education and education %}
+            <div class="right-section">
+              <h2 class="right-section-title">Education</h2>
+              {% for edu in education %}
+                <div class="education-item">
+                  <div class="item-header">
+                    <div class="item-title">{{ edu.degree }}{% if edu.field %} in {{ edu.field }}{% endif %}</div>
+                    <div class="item-subtitle">{{ edu.institution }}</div>
+                    <div class="item-meta">
+                      {% if edu.location %}{{ edu.location }} • {% endif %}
+                      {{ edu.start_date }}{% if not edu.current %} - {{ edu.end_date }}{% else %} - Present{% endif %}
+                    </div>
+                  </div>
+                  {% if edu.description %}
+                    <div class="item-description">{{ edu.description|safe }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Projects -->
+          {% if visibility.projects and projects %}
+            <div class="right-section">
+              <h2 class="right-section-title">Projects</h2>
+              {% for project in projects %}
+                <div class="project-item">
+                  <div class="item-header">
+                    <div class="item-title">{{ project.title }}</div>
+                    <div class="item-meta">
+                      {{ project.start_date }}{% if not project.current %} - {{ project.end_date }}{% else %} - Present{% endif %}
+                      {% if project.live_url or project.github_url %}
+                        •
+                        {% if project.live_url %}
+                          <a href="{{ project.live_url }}" target="_blank">Live Demo</a>
+                        {% endif %}
+                        {% if project.live_url and project.github_url %} • {% endif %}
+                        {% if project.github_url %}
+                          <a href="{{ project.github_url }}" target="_blank">GitHub</a>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% if project.description %}
+                    <div class="item-description">{{ project.description|safe }}</div>
+                  {% endif %}
+                  {% if project.technologies %}
+                    <div class="tech-tags">
+                      {% for tech in project.technologies %}
+                        <span class="tech-tag">{{ tech }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- References -->
+          {% if visibility.references and references %}
+            <div class="right-section">
+              <h2 class="right-section-title">References</h2>
+              {% for reference in references %}
+                <div class="mb-4">
+                  <div class="item-title">{{ reference.name }}</div>
+                  <div class="item-subtitle">{{ reference.position }} at {{ reference.company }}</div>
+                  <div class="text-sm text-gray-600">
+                    {{ reference.email }}{% if reference.phone %} • {{ reference.phone }}{% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
